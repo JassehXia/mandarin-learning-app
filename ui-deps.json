@@ -1,0 +1,13 @@
+[
+    "@radix-ui/react-slot",
+    "class-variance-authority",
+    "clsx",
+    "tailwind-merge",
+    "framer-motion",
+    "lucide-react",
+    "@radix-ui/react-scroll-area",
+    "@prisma/adapter-pg",
+    "pg",
+    "openai",
+    "zod"
+]

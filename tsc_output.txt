@@ -1,0 +1,2 @@
+﻿app/play/[scenarioId]/page.tsx(4,10): error TS2305: Module '"@prisma/client"' has no exported member 'PrismaClient'.
+app/play/[scenarioId]/page.tsx(45,60): error TS7006: Parameter 'm' implicitly has an 'any' type.

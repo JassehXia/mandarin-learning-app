@@ -7,8 +7,62 @@ datasource db {
   provider = "postgresql"
 }
 
-model Stage {
-  id    Int    @id @default(autoincrement())
-  name  String
-  level Int
+model User {
+  id            String         @id @default(cuid())
+  email         String?        @unique
+  conversations Conversation[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Scenario {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  objective   String @default("Complete the conversation naturally.")
+  difficulty  String @default("Beginner") // Beginner, Intermediate, Advanced
+  location    String @default("Street")
+
+  character   Character? @relation(fields: [characterId], references: [id])
+  characterId String?
+
+  conversations Conversation[]
+}
+
+model Character {
+  id                String     @id @default(cuid())
+  name              String
+  role              String // e.g., "Taxi Driver", "Vendor"
+  personalityPrompt String     @db.Text
+  avatarUrl         String?
+  scenarios         Scenario[]
+}
+
+model Conversation {
+  id     String @id @default(cuid())
+  status String @default("ACTIVE") // ACTIVE, COMPLETED, FAILED
+  score  Int?
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  scenario   Scenario @relation(fields: [scenarioId], references: [id])
+  scenarioId String
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id          String  @id @default(cuid())
+  role        String // "user" or "assistant"
+  content     String  @db.Text
+  translation String? @db.Text
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+
+  createdAt DateTime @default(now())
 }
