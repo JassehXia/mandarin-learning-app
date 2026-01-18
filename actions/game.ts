@@ -92,3 +92,8 @@ export async function submitMessage(conversationId: string, content: string) {
         status: evaluation.status
     };
 }
+
+export async function deleteConversation(conversationId: string) {
+    await db.conversation.delete({ where: { id: conversationId } });
+    revalidatePath("/");
+}

@@ -45,9 +45,7 @@ export function Hero() {
                         <Button size="lg" className="bg-[#D4AF37] hover:bg-[#B5952F] text-[#C41E3A] font-bold text-lg px-10 py-7 h-auto shadow-lg hover:shadow-[#D4AF37]/20 transition-all hover:-translate-y-1 rounded-full">
                             Start Your Journey
                         </Button>
-                        <Button size="lg" variant="outline" className="border-[#FDFBF7]/40 text-[#FDFBF7] hover:bg-[#FDFBF7]/10 font-medium text-lg px-10 py-7 h-auto rounded-full">
-                            View Demo
-                        </Button>
+
                     </div>
                 </motion.div>
             </div>
