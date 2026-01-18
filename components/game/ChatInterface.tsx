@@ -11,6 +11,8 @@ interface Message {
     id: string;
     role: "user" | "assistant";
     content: string;
+    pinyin?: string;
+    translation?: string;
 }
 
 interface ChatInterfaceProps {
@@ -64,7 +66,9 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
             const aiMsg: Message = {
                 id: result.message.id,
                 role: "assistant",
-                content: result.message.content
+                content: result.message.content,
+                pinyin: result.message.pinyin || undefined,
+                translation: result.message.translation || undefined
             };
             setMessages((prev) => [...prev, aiMsg]);
 
@@ -85,6 +89,9 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
             {/* HUD Header */}
             <header className="flex items-center justify-between border-b border-[#E8E1D5] bg-white px-4 md:px-6 py-4 shadow-sm z-10">
                 <div className="flex items-center gap-4">
+                    <a href="/" className="text-[#C41E3A] font-bold hover:underline text-sm">
+                        ← Stages
+                    </a>
                     <div className="flex items-center gap-2 text-[#C41E3A] font-serif font-bold">
                         <MapPin className="h-5 w-5" />
                         <span>{scenario.location}</span>
@@ -125,11 +132,21 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
                             >
                                 <div
                                     className={`max-w-[85%] md:max-w-[70%] rounded-2xl px-5 py-3 text-lg leading-relaxed shadow-sm ${msg.role === "user"
-                                            ? "bg-[#C41E3A] text-white rounded-tr-none"
-                                            : "bg-white border border-[#E8E1D5] text-[#2C2C2C] rounded-tl-none"
+                                        ? "bg-[#C41E3A] text-white rounded-tr-none"
+                                        : "bg-white border border-[#E8E1D5] text-[#2C2C2C] rounded-tl-none"
                                         }`}
                                 >
-                                    {msg.content}
+                                    <div>{msg.content}</div>
+                                    {msg.role === "assistant" && (
+                                        <div className="mt-2 pt-2 border-t border-gray-100/50">
+                                            {msg.pinyin && (
+                                                <div className="text-sm text-gray-500 font-medium mb-1">{msg.pinyin}</div>
+                                            )}
+                                            {msg.translation && (
+                                                <div className="text-sm text-gray-400 italic">{msg.translation}</div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

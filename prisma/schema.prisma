@@ -59,6 +59,7 @@ model Message {
   id          String  @id @default(cuid())
   role        String // "user" or "assistant"
   content     String  @db.Text
+  pinyin      String? @db.Text
   translation String? @db.Text
 
   conversation   Conversation @relation(fields: [conversationId], references: [id])

@@ -13,7 +13,7 @@ export async function chatWithCharacter(
     history: ChatMessage[],
     characterPrompt: string,
     userName: string = "Traveler"
-): Promise<{ content: string }> {
+): Promise<{ content: string; pinyin: string; translation: string }> {
     const systemMessage: ChatMessage = {
         role: 'system',
         content: `
@@ -21,11 +21,18 @@ Character Persona:
 ${characterPrompt}
 
 Context:
-You are roleplaying a character in a Mandarin learning game. 
+You are roleplaying a character in a Mandarin learning game.
 You should speak primarily in Mandarin Chinese (Simplified).
 If the user is struggling, you can use simple words, but stay in character.
 Do not break character.
 User's Name: ${userName}
+
+IMPORTANT: You must return your response in a strict JSON format:
+{
+  "content": "The Mandarin response (Hanzi)",
+  "pinyin": "The Pinyin with tone marks",
+  "translation": "The English translation"
+}
         `.trim()
     };
 
@@ -33,10 +40,14 @@ User's Name: ${userName}
         model: 'gpt-4o',
         messages: [systemMessage, ...history],
         temperature: 0.8,
+        response_format: { type: "json_object" },
     });
 
+    const result = JSON.parse(response.choices[0]?.message?.content || '{}');
     return {
-        content: response.choices[0]?.message?.content || "...",
+        content: result.content || "...",
+        pinyin: result.pinyin || "",
+        translation: result.translation || "",
     };
 }
 

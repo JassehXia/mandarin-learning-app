@@ -72,6 +72,8 @@ export async function submitMessage(conversationId: string, content: string) {
             conversationId,
             role: "assistant",
             content: aiResponse.content,
+            pinyin: aiResponse.pinyin,
+            translation: aiResponse.translation
         }
     });
 

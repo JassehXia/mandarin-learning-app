@@ -49,7 +49,9 @@ export default async function PlayPage({ params }: { params: { scenarioId: strin
             initialMessages={fullConversation.messages.map((m: Message) => ({
                 id: m.id,
                 role: m.role as "user" | "assistant",
-                content: m.content
+                content: m.content,
+                pinyin: m.pinyin || undefined,
+                translation: m.translation || undefined
             }))}
             initialStatus={fullConversation.status}
             scenario={{
