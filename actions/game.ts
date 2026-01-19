@@ -112,7 +112,14 @@ export async function submitMessage(conversationId: string, content: string) {
     };
 }
 
+export async function restartGame(conversationId: string, scenarioId: string) {
+    await db.message.deleteMany({ where: { conversationId } });
+    await db.conversation.delete({ where: { id: conversationId } });
+    revalidatePath(`/play/${scenarioId}`);
+}
+
 export async function deleteConversation(conversationId: string) {
     await db.conversation.delete({ where: { id: conversationId } });
     revalidatePath("/");
 }
+

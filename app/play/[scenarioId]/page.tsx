@@ -55,6 +55,7 @@ export default async function PlayPage({ params }: { params: { scenarioId: strin
             }))}
             initialStatus={fullConversation.status}
             scenario={{
+                id: fullConversation.scenario.id,
                 title: fullConversation.scenario.title,
                 objective: fullConversation.scenario.objective,
                 location: fullConversation.scenario.location,

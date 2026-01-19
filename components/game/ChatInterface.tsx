@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MapPin } from "lucide-react";
-import { submitMessage } from "@/actions/game";
+import { Send, MapPin, RotateCcw } from "lucide-react";
+import { submitMessage, restartGame } from "@/actions/game";
 
 interface Message {
     id: string;
@@ -20,6 +20,7 @@ interface ChatInterfaceProps {
     initialMessages: Message[];
     initialStatus: string;
     scenario: {
+        id: string;
         title: string;
         objective: string;
         location: string;
@@ -99,7 +100,25 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
                         {scenario.objective}
                     </div>
                 </div>
-                <div>
+                <div className="flex items-center gap-3">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                            if (confirm("Are you sure you want to start over? Your progress will be lost.")) {
+                                window.location.reload(); // Simple way to trigger fresh startGame call
+                                // We'll actually implement a clean restart action call here
+                                await restartGame(conversationId, scenario.id);
+                                window.location.href = `/play/${scenario.id}`;
+                            }
+                        }}
+                        className="text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 gap-2"
+                        disabled={isLoading}
+                    >
+                        <RotateCcw className="h-4 w-4" />
+                        <span className="hidden sm:inline">Start Over</span>
+                    </Button>
+
                     {/* Status Indicator */}
                     {gameStatus === "COMPLETED" && (
                         <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold uppercase tracking-wider">Success</span>
@@ -112,6 +131,7 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
                     )}
                 </div>
             </header>
+
 
             {/* Chat Area */}
             <div className="flex-1 relative overflow-hidden flex flex-col">

@@ -49,7 +49,7 @@ IMPORTANT: You must return your response in a strict JSON format:
     console.log("-----------------------");
 
     const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: messages,
         temperature: 0.8,
         response_format: { type: "json_object" },
@@ -68,7 +68,7 @@ export async function evaluateObjective(
     objective: string
 ): Promise<{ status: 'ACTIVE' | 'COMPLETED' | 'FAILED' }> {
     const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
             {
                 role: 'system',
