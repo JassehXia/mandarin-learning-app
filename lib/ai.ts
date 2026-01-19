@@ -43,7 +43,7 @@ IMPORTANT: You must return your response in a strict JSON format:
 
 Status Rules:
 - "COMPLETED": Goal achieved (e.g., reached destination, bought item).
-- "FAILED": Explicit failure (e.g., insulted character, gave up).
+- "FAILED": Explicit failure (e.g., insulted character, gave up, got off track).
 - "ACTIVE": Conversation is ongoing.
         `.trim()
     };
