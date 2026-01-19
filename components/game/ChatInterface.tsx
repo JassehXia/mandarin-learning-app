@@ -89,9 +89,6 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
             {/* HUD Header */}
             <header className="flex items-center justify-between border-b border-[#E8E1D5] bg-white px-4 md:px-6 py-4 shadow-sm z-10">
                 <div className="flex items-center gap-4">
-                    <a href="/" className="text-[#C41E3A] font-bold hover:underline text-sm">
-                        ← Stages
-                    </a>
                     <div className="flex items-center gap-2 text-[#C41E3A] font-serif font-bold">
                         <MapPin className="h-5 w-5" />
                         <span>{scenario.location}</span>

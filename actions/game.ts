@@ -3,8 +3,13 @@
 import { prisma as db } from "@/lib/prisma"; // Use the singleton
 import { chatWithCharacter, evaluateObjective } from "@/lib/ai";
 import { revalidatePath } from "next/cache";
+import { getOrCreateUser } from "@/lib/auth-util";
 
 export async function startGame(scenarioId: string, userId?: string) {
+    // 0. Resolve User
+    const user = await getOrCreateUser();
+    const effectiveUserId = user?.id || userId;
+
     // 1. Validate Scenario
     const scenario = await db.scenario.findUnique({
         where: { id: scenarioId },
@@ -19,7 +24,8 @@ export async function startGame(scenarioId: string, userId?: string) {
     const existingConversation = await db.conversation.findFirst({
         where: {
             scenarioId: scenario.id,
-            status: "ACTIVE"
+            status: "ACTIVE",
+            userId: effectiveUserId
         },
         orderBy: { createdAt: 'desc' }
     });
@@ -32,7 +38,7 @@ export async function startGame(scenarioId: string, userId?: string) {
     const conversation = await db.conversation.create({
         data: {
             scenarioId: scenario.id,
-            userId: userId, // Optional for now
+            userId: effectiveUserId, // Link to real user if logged in
             status: "ACTIVE",
             // Initial AI greeting could go here if we wanted
         }

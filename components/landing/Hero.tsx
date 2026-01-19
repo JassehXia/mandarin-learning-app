@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 export function Hero() {
     return (
-        <section className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-[#C41E3A]">
+        <section className="relative h-[calc(100vh-64px)] w-full overflow-hidden flex items-center justify-center bg-[#C41E3A]">
             {/* CSS Pattern Background - Traditional Clouds/Waves motif */}
             <div className="absolute inset-0 z-0 opacity-20">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-500/20 via-transparent to-transparent" />
@@ -43,11 +44,21 @@ export function Hero() {
                         Navigate real scenarios, from bustling markets to quiet tea houses.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                        <Link href="/stages">
-                            <Button size="lg" className="bg-[#D4AF37] hover:bg-[#B5952F] text-[#C41E3A] font-bold text-lg px-10 py-7 h-auto shadow-lg hover:shadow-[#D4AF37]/20 transition-all hover:-translate-y-1 rounded-full">
-                                Start Your Journey
-                            </Button>
-                        </Link>
+                        <SignedOut>
+                            <SignInButton mode="modal">
+                                <Button size="lg" className="bg-[#D4AF37] hover:bg-[#B5952F] text-[#C41E3A] font-bold text-lg px-10 py-7 h-auto shadow-lg hover:shadow-[#D4AF37]/20 transition-all hover:-translate-y-1 rounded-full">
+                                    Start Your Journey
+                                </Button>
+                            </SignInButton>
+                        </SignedOut>
+
+                        <SignedIn>
+                            <Link href="/stages">
+                                <Button size="lg" className="bg-[#D4AF37] hover:bg-[#B5952F] text-[#C41E3A] font-bold text-lg px-10 py-7 h-auto shadow-lg hover:shadow-[#D4AF37]/20 transition-all hover:-translate-y-1 rounded-full">
+                                    Continue Your Journey
+                                </Button>
+                            </Link>
+                        </SignedIn>
                     </div>
                 </motion.div>
             </div>
