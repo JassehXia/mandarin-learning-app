@@ -263,12 +263,20 @@ export function ChatInterface({
                                         <div className="space-y-3">
                                             {corrections.map((c: any, i: number) => (
                                                 <div key={i} className="bg-[#FDFBF7] border border-[#E8E1D5] rounded-xl p-4">
-                                                    <div className="flex flex-col gap-1 mb-2">
-                                                        <span className="text-xs text-red-500 line-through decoration-red-300 font-medium">{c.original}</span>
-                                                        <span className="text-lg font-bold text-[#2C2C2C]">{c.correction}</span>
-                                                        <span className="text-xs text-[#8A7E72] font-semibold tracking-wide uppercase">{c.pinyin}</span>
+                                                    <div className="flex flex-col gap-2 mb-3">
+                                                        <div className="flex flex-col opacity-60">
+                                                            <span className="text-xs font-bold text-red-500/70 uppercase tracking-tighter mb-0.5">Your Phrase</span>
+                                                            <span className="text-sm line-through decoration-red-200">{c.original}</span>
+                                                            <span className="text-[10px] text-gray-400 font-medium italic">{c.originalPinyin}</span>
+                                                        </div>
+                                                        <div className="h-px bg-[#E8E1D5]/50 w-full my-1" />
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-tighter mb-0.5">Better Way</span>
+                                                            <span className="text-lg font-bold text-[#2C2C2C] leading-tight">{c.correction}</span>
+                                                            <span className="text-xs text-[#C41E3A] font-semibold tracking-wide">{c.correctionPinyin}</span>
+                                                        </div>
                                                     </div>
-                                                    <p className="text-sm text-[#5C4B3A] leading-relaxed border-t border-[#E8E1D5] pt-2 mt-2 font-medium">{c.explanation}</p>
+                                                    <p className="text-sm text-[#5C4B3A] leading-relaxed border-t border-[#E8E1D5] pt-2 font-medium bg-white/50 -mx-4 px-4 rounded-b-xl">{c.explanation}</p>
                                                 </div>
                                             ))}
                                         </div>

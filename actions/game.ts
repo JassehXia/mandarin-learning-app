@@ -110,8 +110,13 @@ export async function submitMessage(conversationId: string, content: string) {
             scenario.title,
             scenario.objective
         );
-        feedback = coachReport.feedback;
-        score = coachReport.score;
+
+        // Enrich corrections with pinyin-pro for accuracy
+        const enrichedCorrections = coachReport.corrections.map(c => ({
+            ...c,
+            originalPinyin: pinyin(c.original),
+            correctionPinyin: pinyin(c.correction)
+        }));
 
         await db.conversation.update({
             where: { id: conversation.id },
@@ -119,12 +124,12 @@ export async function submitMessage(conversationId: string, content: string) {
                 status: aiResponse.status,
                 feedback: coachReport.feedback,
                 score: coachReport.score,
-                corrections: coachReport.corrections as any
+                corrections: enrichedCorrections as any
             }
         });
         feedback = coachReport.feedback;
         score = coachReport.score;
-        corrections = coachReport.corrections;
+        corrections = enrichedCorrections;
     }
 
     revalidatePath(`/play/${scenario.id}`);
