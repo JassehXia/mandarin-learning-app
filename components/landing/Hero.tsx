@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 export function Hero() {
@@ -42,10 +43,11 @@ export function Hero() {
                         Navigate real scenarios, from bustling markets to quiet tea houses.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                        <Button size="lg" className="bg-[#D4AF37] hover:bg-[#B5952F] text-[#C41E3A] font-bold text-lg px-10 py-7 h-auto shadow-lg hover:shadow-[#D4AF37]/20 transition-all hover:-translate-y-1 rounded-full">
-                            Start Your Journey
-                        </Button>
-
+                        <Link href="/stages">
+                            <Button size="lg" className="bg-[#D4AF37] hover:bg-[#B5952F] text-[#C41E3A] font-bold text-lg px-10 py-7 h-auto shadow-lg hover:shadow-[#D4AF37]/20 transition-all hover:-translate-y-1 rounded-full">
+                                Start Your Journey
+                            </Button>
+                        </Link>
                     </div>
                 </motion.div>
             </div>
