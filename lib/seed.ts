@@ -21,10 +21,10 @@ async function main() {
     console.log("Starting seed...");
 
     // Clear existing data (optional, be careful in prod)
-    // await prisma.message.deleteMany();
-    // await prisma.conversation.deleteMany();
-    // await prisma.scenario.deleteMany();
-    // await prisma.character.deleteMany();
+    await prisma.message.deleteMany();
+    await prisma.conversation.deleteMany();
+    await prisma.scenario.deleteMany();
+    await prisma.character.deleteMany();
 
     console.log("Creating Test Character...");
     const driverZhang = await prisma.character.create({
@@ -66,6 +66,69 @@ async function main() {
             difficulty: "Intermediate",
             location: "Night Market",
             characterId: auntieWang.id,
+        }
+    });
+
+    console.log("Creating Grocery Store Character...");
+    const liJie = await prisma.character.create({
+        data: {
+            name: "Li Jie",
+            role: "Store Clerk",
+            personalityPrompt: "You are Li Jie, a helpful but busy clerk at a local grocery store. You are currently stocking shelves. You speak standard Mandarin. You know where everything is. If someone asks for bananas (xiāngjiāo), you should point them to the fruit section near the entrance. You are polite but efficient.",
+        }
+    });
+
+    console.log("Creating Grocery Store Scenario...");
+    await prisma.scenario.create({
+        data: {
+            title: "The Fruit Quest",
+            description: "You're in a large grocery store and really need some bananas for a recipe. The store is crowded, and you're not sure where the fruit section is. Ask a clerk for help.",
+            objective: "Find Li Jie and successfully ask for the location of bananas (xiāngjiāo).",
+            difficulty: "Beginner",
+            location: "Grocery Store",
+            characterId: liJie.id,
+        }
+    });
+
+    console.log("Creating Friend Character...");
+    const xiaoMing = await prisma.character.create({
+        data: {
+            name: "Xiao Ming",
+            role: "Friend",
+            personalityPrompt: "You are Xiao Ming, a close friend of the user. You are casual, use common slang like 'yo' or 'zěnme yàng', and are very flexible with plans. You speak informal Mandarin. You're happy to hang out but want to make sure you have a clear plan. If the user doesn't suggest a specific time or place, you should ask for clarification.",
+        }
+    });
+
+    console.log("Creating Texting Scenario...");
+    await prisma.scenario.create({
+        data: {
+            title: "Weekend Plans",
+            description: "You're texting your friend Xiao Ming to hang out this weekend. You need to agree on a specific date, a time, and a place to meet.",
+            objective: "Coordinate with Xiao Ming and set a specific date, time, and location for your meeting.",
+            difficulty: "Intermediate",
+            location: "Messaging App",
+            characterId: xiaoMing.id,
+        }
+    });
+
+    console.log("Creating Passerby Character...");
+    const mrChen = await prisma.character.create({
+        data: {
+            name: "Mr. Chen",
+            role: "Local Inhabitant",
+            personalityPrompt: "You are Mr. Chen, a kind elderly man who has lived in this neighborhood for 40 years. You are very polite and speak clearly. You know every nook and cranny of the area. If someone asks for the nearest coffee shop (kāfēi diàn), you should give them detailed directions (e.g., 'go straight, turn left at the bank').",
+        }
+    });
+
+    console.log("Creating Cafe Directions Scenario...");
+    await prisma.scenario.create({
+        data: {
+            title: "Morning Caffeine",
+            description: "You're lost in a new neighborhood and desperately need a coffee. You see a friendly-looking local, Mr. Chen, sitting on a bench. Ask him for directions.",
+            objective: "Successfully ask Mr. Chen for directions to the nearest coffee shop (kāfēi diàn) and acknowledge his instructions.",
+            difficulty: "Beginner",
+            location: "City Street",
+            characterId: mrChen.id,
         }
     });
 
