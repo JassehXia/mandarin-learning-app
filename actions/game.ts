@@ -1,9 +1,10 @@
 "use server";
 
 import { prisma as db } from "@/lib/prisma"; // Use the singleton
-import { chatWithCharacter, evaluateObjective } from "@/lib/ai";
+import { chatWithCharacter } from "@/lib/ai";
 import { revalidatePath } from "next/cache";
 import { getOrCreateUser } from "@/lib/auth-util";
+import { pinyin } from "pinyin-pro";
 
 export async function startGame(scenarioId: string, userId?: string) {
     // 0. Resolve User
@@ -79,28 +80,28 @@ export async function submitMessage(conversationId: string, content: string) {
     }));
     history.push({ role: 'user', content });
 
-    // 4. Run AI (Parallel Execution)
-    const [aiResponse, evaluation] = await Promise.all([
-        chatWithCharacter(history, character.personalityPrompt),
-        evaluateObjective(history, scenario.objective)
-    ]);
+    // 4. Run AI
+    const aiResponse = await chatWithCharacter(history, character.personalityPrompt, scenario.objective);
 
-    // 5. Save AI Response
+    // 5. Generate Pinyin Server-Side
+    const responsePinyin = pinyin(aiResponse.content);
+
+    // 6. Save AI Response
     const newMessage = await db.message.create({
         data: {
             conversationId,
             role: "assistant",
             content: aiResponse.content,
-            pinyin: aiResponse.pinyin,
+            pinyin: responsePinyin,
             translation: aiResponse.translation
         }
     });
 
     // 6. Update Status if changed
-    if (evaluation.status !== conversation.status && evaluation.status !== "ACTIVE") {
+    if (aiResponse.status !== conversation.status && aiResponse.status !== "ACTIVE") {
         await db.conversation.update({
             where: { id: conversation.id },
-            data: { status: evaluation.status }
+            data: { status: aiResponse.status }
         });
     }
 
@@ -108,7 +109,7 @@ export async function submitMessage(conversationId: string, content: string) {
 
     return {
         message: newMessage,
-        status: evaluation.status
+        status: aiResponse.status
     };
 }
 
