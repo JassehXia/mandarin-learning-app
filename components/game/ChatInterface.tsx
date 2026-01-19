@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MapPin, RotateCcw } from "lucide-react";
+import { Send, MapPin, RotateCcw, Languages } from "lucide-react";
 import { submitMessage, restartGame } from "@/actions/game";
 
 interface Message {
@@ -37,7 +37,20 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [gameStatus, setGameStatus] = useState(initialStatus);
+    const [visibleTranslations, setVisibleTranslations] = useState<Set<string>>(new Set());
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    const toggleTranslation = (id: string) => {
+        setVisibleTranslations((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+            return next;
+        });
+    };
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -160,7 +173,31 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
                                                 <div className="text-sm text-gray-500 font-medium mb-1">{msg.pinyin}</div>
                                             )}
                                             {msg.translation && (
-                                                <div className="text-sm text-gray-400 italic">{msg.translation}</div>
+                                                <div className="mt-1">
+                                                    {visibleTranslations.has(msg.id) ? (
+                                                        <div className="text-sm text-gray-400 italic bg-gray-50/50 p-2 rounded-lg border border-gray-100 relative group/trans">
+                                                            {msg.translation}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => toggleTranslation(msg.id)}
+                                                                className="absolute top-1 right-1 opacity-0 group-hover/trans:opacity-100 transition-opacity text-[10px] text-gray-300 hover:text-[#C41E3A]"
+                                                                title="Hide Translation"
+                                                            >
+                                                                Hide
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => toggleTranslation(msg.id)}
+                                                            className="h-7 text-[10px] text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 gap-1.5 self-start px-2 mt-1"
+                                                        >
+                                                            <Languages className="w-3 h-3" />
+                                                            Show Translation
+                                                        </Button>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                     )}
