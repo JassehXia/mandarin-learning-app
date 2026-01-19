@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma as db } from "@/lib/prisma"; // Use the singleton
-import { chatWithCharacter } from "@/lib/ai";
+import { chatWithCharacter, generateFeedback } from "@/lib/ai";
 import { revalidatePath } from "next/cache";
 import { getOrCreateUser } from "@/lib/auth-util";
 import { pinyin } from "pinyin-pro";
@@ -97,19 +97,44 @@ export async function submitMessage(conversationId: string, content: string) {
         }
     });
 
-    // 6. Update Status if changed
-    if (aiResponse.status !== conversation.status && aiResponse.status !== "ACTIVE") {
+    // 7. Update Status & Generate Feedback if ended
+    let finalStatus = aiResponse.status;
+    let feedback = null;
+    let score = null;
+    let corrections = null;
+
+    if (aiResponse.status !== "ACTIVE") {
+        // Conversation just ended, get coach feedback
+        const coachReport = await generateFeedback(
+            [...history, { role: 'assistant', content: aiResponse.content }],
+            scenario.title,
+            scenario.objective
+        );
+        feedback = coachReport.feedback;
+        score = coachReport.score;
+
         await db.conversation.update({
             where: { id: conversation.id },
-            data: { status: aiResponse.status }
+            data: {
+                status: aiResponse.status,
+                feedback: coachReport.feedback,
+                score: coachReport.score,
+                corrections: coachReport.corrections as any
+            }
         });
+        feedback = coachReport.feedback;
+        score = coachReport.score;
+        corrections = coachReport.corrections;
     }
 
     revalidatePath(`/play/${scenario.id}`);
 
     return {
         message: newMessage,
-        status: aiResponse.status
+        status: finalStatus,
+        feedback,
+        score,
+        corrections
     };
 }
 

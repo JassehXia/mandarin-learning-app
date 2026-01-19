@@ -73,3 +73,58 @@ Status Rules:
     };
 }
 
+export async function generateFeedback(
+    history: ChatMessage[],
+    scenarioTitle: string,
+    objective: string
+): Promise<{ score: number; feedback: string; corrections: { original: string; correction: string; pinyin: string; explanation: string }[] }> {
+    const response = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+            {
+                role: 'system',
+                content: `
+You are a professional Mandarin Language Coach and Games Master.
+Analyze the following conversation from a roleplay scenario.
+
+Scenario: "${scenarioTitle}"
+Objective: "${objective}"
+
+Please evaluate the User's performance based on:
+1. Goal Completion: Did they achieve the objective?
+2. Language Proficiency: vocabulary usage, grammar, and naturalness.
+3. Communication Effectiveness: Were they clear and polite?
+
+IMPORTANT: Find any specific Mandarin phrases the user got wrong or could say more naturally.
+Include them in the "corrections" array.
+
+You must return your response in a strict JSON format:
+{
+  "score": (a number from 0 to 100),
+  "feedback": "A concise paragraph (2-3 sentences) summarizing their overall performance.",
+  "corrections": [
+    {
+      "original": "The user's original incorrect/awkward Mandarin",
+      "correction": "The ideal/correct Mandarin",
+      "pinyin": "Pinyin for the correction",
+      "explanation": "Briefly why this is better (in English)"
+    }
+  ]
+}
+                `.trim()
+            },
+            ...history
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7,
+    });
+
+    const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+    return {
+        score: result.score || 0,
+        feedback: result.feedback || "Great attempt! Keep practicing.",
+        corrections: result.corrections || []
+    };
+}
+
+

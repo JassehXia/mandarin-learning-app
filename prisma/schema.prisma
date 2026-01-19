@@ -40,9 +40,11 @@ model Character {
 }
 
 model Conversation {
-  id     String @id @default(cuid())
-  status String @default("ACTIVE") // ACTIVE, COMPLETED, FAILED
-  score  Int?
+  id          String  @id @default(cuid())
+  status      String  @default("ACTIVE") // ACTIVE, COMPLETED, FAILED
+  score       Int?
+  feedback    String? @db.Text
+  corrections Json?   @default("[]")
 
   user   User?   @relation(fields: [userId], references: [id])
   userId String?

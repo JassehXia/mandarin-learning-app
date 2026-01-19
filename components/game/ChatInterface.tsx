@@ -19,6 +19,9 @@ interface ChatInterfaceProps {
     conversationId: string;
     initialMessages: Message[];
     initialStatus: string;
+    initialScore?: number | null;
+    initialFeedback?: string | null;
+    initialCorrections?: any;
     scenario: {
         id: string;
         title: string;
@@ -32,11 +35,22 @@ interface ChatInterfaceProps {
     }
 }
 
-export function ChatInterface({ conversationId, initialMessages, initialStatus, scenario }: ChatInterfaceProps) {
+export function ChatInterface({
+    conversationId,
+    initialMessages,
+    initialStatus,
+    initialScore,
+    initialFeedback,
+    initialCorrections,
+    scenario
+}: ChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [gameStatus, setGameStatus] = useState(initialStatus);
+    const [score, setScore] = useState<number | null>(initialScore || null);
+    const [feedback, setFeedback] = useState<string | null>(initialFeedback || null);
+    const [corrections, setCorrections] = useState<any[]>(initialCorrections || []);
     const [visibleTranslations, setVisibleTranslations] = useState<Set<string>>(new Set());
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -89,6 +103,9 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
             if (result.status !== gameStatus) {
                 setGameStatus(result.status);
             }
+            if (result.score !== null) setScore(result.score);
+            if (result.feedback !== null) setFeedback(result.feedback);
+            if (result.corrections) setCorrections(result.corrections);
 
         } catch (error) {
             console.error("Failed to send message", error);
@@ -215,6 +232,70 @@ export function ChatInterface({ conversationId, initialMessages, initialStatus, 
                         )}
                         <div ref={scrollRef} className="h-4" />
                     </div>
+
+                    {/* Report Card Overlay */}
+                    {gameStatus !== "ACTIVE" && feedback && (
+                        <div className="max-w-3xl mx-auto px-4 md:px-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="bg-white border-2 border-[#E8E1D5] rounded-3xl p-8 shadow-xl relative overflow-hidden">
+                                <div className="absolute -top-2 -right-2 w-32 h-32 bg-[#C41E3A]/5 rounded-bl-full flex items-center justify-center pt-2 pr-2">
+                                    <div className="text-4xl font-serif font-black text-[#C41E3A]">
+                                        {score}/100
+                                    </div>
+                                </div>
+
+                                <h3 className="text-2xl font-serif font-bold text-[#2C2C2C] mb-4 flex items-center gap-2">
+                                    Coach's Report
+                                    <span className={`text-sm px-3 py-1 rounded-full uppercase tracking-widest ${gameStatus === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                        {gameStatus}
+                                    </span>
+                                </h3>
+
+                                <p className="text-[#5C4B3A] leading-relaxed italic text-lg mb-8">
+                                    "{feedback}"
+                                </p>
+
+                                {corrections && corrections.length > 0 && (
+                                    <div className="mb-8 space-y-4">
+                                        <h4 className="text-sm font-bold text-[#D4AF37] uppercase tracking-widest flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
+                                            Key Corrections
+                                        </h4>
+                                        <div className="space-y-3">
+                                            {corrections.map((c: any, i: number) => (
+                                                <div key={i} className="bg-[#FDFBF7] border border-[#E8E1D5] rounded-xl p-4">
+                                                    <div className="flex flex-col gap-1 mb-2">
+                                                        <span className="text-xs text-red-500 line-through decoration-red-300 font-medium">{c.original}</span>
+                                                        <span className="text-lg font-bold text-[#2C2C2C]">{c.correction}</span>
+                                                        <span className="text-xs text-[#8A7E72] font-semibold tracking-wide uppercase">{c.pinyin}</span>
+                                                    </div>
+                                                    <p className="text-sm text-[#5C4B3A] leading-relaxed border-t border-[#E8E1D5] pt-2 mt-2 font-medium">{c.explanation}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <Button
+                                        onClick={async () => {
+                                            await restartGame(conversationId, scenario.id);
+                                            window.location.href = `/play/${scenario.id}`;
+                                        }}
+                                        className="flex-1 bg-[#C41E3A] hover:bg-[#A01830] text-white font-bold h-12 rounded-xl border-b-4 border-[#8A1529]"
+                                    >
+                                        Try Again
+                                    </Button>
+                                    <Button
+                                        onClick={() => window.location.href = '/stages'}
+                                        variant="outline"
+                                        className="flex-1 border-2 border-[#E8E1D5] text-[#5C4B3A] font-bold h-12 rounded-xl hover:bg-[#FDFBF7]"
+                                    >
+                                        Back to Stages
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </ScrollArea>
             </div>
 

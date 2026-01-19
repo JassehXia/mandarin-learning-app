@@ -9,7 +9,7 @@ export function Header() {
         <header className="sticky top-0 z-50 w-full border-b border-[#E8E1D5] bg-[#FDFBF7]/80 backdrop-blur-md">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2">
-                    <span className="text-2xl font-serif font-bold text-[#C41E3A] tracking-tight">Learn</span>
+                    <span className="text-2xl font-serif font-bold text-[#C41E3A] tracking-tight">StreetLevel</span>
                     <span className="text-xs font-medium text-[#D4AF37] uppercase tracking-widest hidden sm:inline-block">Mandarin</span>
                 </Link>
 

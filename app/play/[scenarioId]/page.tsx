@@ -54,6 +54,9 @@ export default async function PlayPage({ params }: { params: { scenarioId: strin
                 translation: m.translation || undefined
             }))}
             initialStatus={fullConversation.status}
+            initialScore={fullConversation.score}
+            initialFeedback={fullConversation.feedback}
+            initialCorrections={fullConversation.corrections}
             scenario={{
                 id: fullConversation.scenario.id,
                 title: fullConversation.scenario.title,
