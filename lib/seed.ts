@@ -47,6 +47,28 @@ async function main() {
         }
     });
 
+    console.log("Creating Food Vendor Character...");
+    const auntieWang = await prisma.character.create({
+        data: {
+            name: "Auntie Wang",
+            role: "Food Vendor",
+            personalityPrompt: "You are Auntie Wang, an energetic owner of a dumpling stall at a buzzing night market in China. You speak loud, fast, and enthusiastic Mandarin. You are very proud of your dumplings (shuǐjiǎo). You always ask customers what filling they want: Pork & Chive (zhūròu jiǔcài), Shrimp (xiā rén), or Cabbage (báicài). You also ask if they want spicy sauce (làjiāo). If they order slowly, you might rush them gently because there is a line. Your goal is to sell them delicious food.",
+            avatarUrl: "/avatars/auntie-wang.png" // Placeholder
+        }
+    });
+
+    console.log("Creating Night Market Scenario...");
+    const nightMarketScenario = await prisma.scenario.create({
+        data: {
+            title: "Night Market Feast",
+            description: "You are starving at a night market. The smell of fresh dumplings is irresistible. Auntie Wang is looking at you expectantly.",
+            objective: "Order a serving of dumplings with a specific filling (e.g., Pork & Chives) and successfully pay for it.",
+            difficulty: "Intermediate",
+            location: "Night Market",
+            characterId: auntieWang.id,
+        }
+    });
+
     console.log("Seeding completed.");
     console.log("Created Scenario:", airportScenario.title);
 }

@@ -27,6 +27,13 @@ If the user is struggling, you can use simple words, but stay in character.
 Do not break character.
 User's Name: ${userName}
 
+Instructions:
+1. Pay close attention to the "Conversation History".
+2. If the user has already ordered/answered your question, acknowledge it and move on.
+3. do NOT repeat your initial greeting ("Welcome!") if the conversation has already started.
+4. If the user confirms a choice (e.g., "Pork"), confirm it and ask for the next step (e.g., payment or sauce).
+5. Do not keep asking the same question ("What filling?") if they just answered it.
+
 IMPORTANT: You must return your response in a strict JSON format:
 {
   "content": "The Mandarin response (Hanzi)",
@@ -36,9 +43,14 @@ IMPORTANT: You must return your response in a strict JSON format:
         `.trim()
     };
 
+    const messages = [systemMessage, ...history];
+    console.log("--- AI PROMPT DEBUG ---");
+    console.log(JSON.stringify(messages, null, 2));
+    console.log("-----------------------");
+
     const response = await openai.chat.completions.create({
         model: 'gpt-4o',
-        messages: [systemMessage, ...history],
+        messages: messages,
         temperature: 0.8,
         response_format: { type: "json_object" },
     });
@@ -81,6 +93,8 @@ Rules:
     });
 
     const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+    console.log(`[Game Master] Objective: "${objective}"`);
+    console.log(`[Game Master] Verdict: ${result.status}`);
     return {
         status: result.status || 'ACTIVE',
     };

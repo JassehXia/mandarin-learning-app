@@ -15,7 +15,20 @@ export async function startGame(scenarioId: string, userId?: string) {
         throw new Error("Scenario not found");
     }
 
-    // 2. Create Conversation
+    // 2. Check for existing ACTIVE conversation
+    const existingConversation = await db.conversation.findFirst({
+        where: {
+            scenarioId: scenario.id,
+            status: "ACTIVE"
+        },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    if (existingConversation) {
+        return existingConversation;
+    }
+
+    // 3. Create Conversation
     const conversation = await db.conversation.create({
         data: {
             scenarioId: scenario.id,
