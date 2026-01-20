@@ -18,6 +18,17 @@ model User {
   updatedAt            DateTime       @updatedAt
 }
 
+model Pathway {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  icon        String? // Lucide icon name
+  order       Int        @default(0)
+  scenarios   Scenario[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
 model Scenario {
   id          String @id @default(cuid())
   title       String
@@ -26,7 +37,9 @@ model Scenario {
   difficulty  String @default("Beginner") // Beginner, Intermediate, Advanced
   location    String @default("Street")
   keyPhrases  Json?  @default("[]")
-  pathway     String @default("General") // Category for the tree branch
+
+  pathway   Pathway @relation(fields: [pathwayId], references: [id])
+  pathwayId String
 
   // Tree positioning (relative % or pixels)
   x Float @default(0)
