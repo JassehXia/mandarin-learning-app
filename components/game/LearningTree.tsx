@@ -49,8 +49,19 @@ export function LearningTree({ scenarios, completedScenarioIds }: LearningTreePr
         return lines;
     }, [scenariosWithStatus]);
 
+    // Calculate dynamic container height based on max Y coordinate
+    const containerHeight = useMemo(() => {
+        if (scenarios.length === 0) return 1000;
+        const maxY = Math.max(...scenarios.map(s => s.y));
+        // y is multiplied by 10 in positioning, add extra for labels and padding
+        return Math.max(1000, (maxY * 10) + 200);
+    }, [scenarios]);
+
     return (
-        <div className="relative w-full max-w-5xl mx-auto py-0 px-4 min-h-[1000px] overflow-visible bg-[url('https://www.transparenttextures.com/patterns/rice-paper.png')] rounded-[3rem] border border-[#E8E1D5]/50 shadow-inner">
+        <div
+            className="relative w-full max-w-5xl mx-auto py-0 px-4 overflow-visible bg-[url('https://www.transparenttextures.com/patterns/rice-paper.png')] rounded-[3rem] border border-[#E8E1D5]/50 shadow-inner"
+            style={{ minHeight: `${containerHeight}px` }}
+        >
             {/* SVG Connections Layer */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible">
                 <defs>

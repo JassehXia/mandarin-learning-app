@@ -26,6 +26,7 @@ export function ReviewQuiz({ initialFlashcards }: ReviewQuizProps) {
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [isFinished, setIsFinished] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [showPinyin, setShowPinyin] = useState(false);
 
     // Initialize queue on mount or if initialFlashcards changes
     useEffect(() => {
@@ -65,6 +66,7 @@ export function ReviewQuiz({ initialFlashcards }: ReviewQuizProps) {
             setOptions(generateOptions(currentCard.meaning));
             setSelectedOption(null);
             setIsCorrect(null);
+            setShowPinyin(false);
         } else if (queue.length > 0 && currentIndex >= queue.length) {
             setIsFinished(true);
         }
@@ -175,9 +177,20 @@ export function ReviewQuiz({ initialFlashcards }: ReviewQuizProps) {
                             <h3 className="text-6xl md:text-7xl font-bold text-[#2C2C2C] mb-4 font-serif">
                                 {currentCard.hanzi}
                             </h3>
-                            <p className="text-xl text-[#C41E3A] font-bold tracking-wide italic mb-6">
-                                {currentCard.pinyin}
-                            </p>
+                            {showPinyin ? (
+                                <p className="text-xl text-[#C41E3A] font-bold tracking-wide italic mb-6 animate-in fade-in zoom-in-95 duration-300">
+                                    {currentCard.pinyin}
+                                </p>
+                            ) : (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setShowPinyin(true)}
+                                    className="text-xs font-bold text-[#C41E3A]/40 mb-6 hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 uppercase tracking-widest"
+                                >
+                                    Show Pinyin
+                                </Button>
+                            )}
 
                             <Button
                                 variant="outline"

@@ -25,17 +25,7 @@ export default async function StagesPage() {
     });
 
     // Determine completed scenarios
-    const completedScenarioIds = new Set<string>();
-    if (user) {
-        const completedConversations = await prisma.conversation.findMany({
-            where: {
-                userId: user.id,
-                status: "COMPLETED"
-            },
-            select: { scenarioId: true }
-        });
-        completedConversations.forEach(c => completedScenarioIds.add(c.scenarioId));
-    }
+    const completedScenarioIds = new Set<string>(user?.completedScenarioIds || []);
 
     return (
         <main className="min-h-screen bg-[#FDFBF7] pt-10 pb-32 overflow-x-hidden">

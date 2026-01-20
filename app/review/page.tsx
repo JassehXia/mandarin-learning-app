@@ -29,7 +29,7 @@ export default async function ReviewPage() {
                                 </Button>
                             </Link>
                             <h1 className="text-4xl md:text-5xl font-serif font-black text-[#2C2C2C] tracking-tight">
-                                Daily <span className="text-[#C41E3A]">Review</span>
+                                <span className="text-[#C41E3A]">Review</span>
                             </h1>
                         </div>
                         <div className="text-right hidden sm:block">

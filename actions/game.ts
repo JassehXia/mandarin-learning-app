@@ -119,23 +119,52 @@ export async function submitMessage(conversationId: string, content: string) {
             correctionPinyin: pinyin(c.correction)
         }));
 
-        await db.conversation.update({
-            where: { id: conversation.id },
-            data: {
-                status: aiResponse.status,
-                feedback: coachReport.feedback,
-                score: coachReport.score,
-                corrections: enrichedCorrections as any,
-                suggestedFlashcards: coachReport.suggestedFlashcards as any
-            }
-        });
         feedback = coachReport.feedback;
         score = coachReport.score;
         corrections = enrichedCorrections;
         suggestedFlashcards = coachReport.suggestedFlashcards;
+
+        if (aiResponse.status === "COMPLETED" && conversation.userId) {
+            // Persist progress to User model
+            const user = await db.user.findUnique({
+                where: { id: conversation.userId },
+                select: { completedScenarioIds: true }
+            });
+
+            if (user && !user.completedScenarioIds.includes(scenario.id)) {
+                await db.user.update({
+                    where: { id: conversation.userId },
+                    data: {
+                        completedScenarioIds: {
+                            push: scenario.id
+                        }
+                    }
+                });
+            }
+
+            // DELETE messages and conversation to save storage (as requested)
+            // Note: We've already gathered the feedback so we can return it to the UI
+            await db.message.deleteMany({ where: { conversationId } });
+            await db.conversation.delete({ where: { id: conversationId } });
+        } else {
+            // For FAILED or if no userId, we can keep it or delete it. 
+            // Usually, we'd only persist mastery on COMPLETED.
+            // Let's at least update the status if we don't delete.
+            await db.conversation.update({
+                where: { id: conversation.id },
+                data: {
+                    status: aiResponse.status,
+                    feedback: coachReport.feedback,
+                    score: coachReport.score,
+                    corrections: enrichedCorrections as any,
+                    suggestedFlashcards: coachReport.suggestedFlashcards as any
+                }
+            });
+        }
     }
 
     revalidatePath(`/play/${scenario.id}`);
+    revalidatePath(`/stages`);
 
     return {
         message: newMessage,
@@ -148,13 +177,20 @@ export async function submitMessage(conversationId: string, content: string) {
 }
 
 export async function restartGame(conversationId: string, scenarioId: string) {
-    await db.message.deleteMany({ where: { conversationId } });
-    await db.conversation.delete({ where: { id: conversationId } });
+    // Check if conversation still exists before trying to delete
+    const exists = await db.conversation.findUnique({ where: { id: conversationId } });
+    if (exists) {
+        await db.message.deleteMany({ where: { conversationId } });
+        await db.conversation.delete({ where: { id: conversationId } });
+    }
     revalidatePath(`/play/${scenarioId}`);
 }
 
 export async function deleteConversation(conversationId: string) {
-    await db.conversation.delete({ where: { id: conversationId } });
+    const exists = await db.conversation.findUnique({ where: { id: conversationId } });
+    if (exists) {
+        await db.conversation.delete({ where: { id: conversationId } });
+    }
     revalidatePath("/");
 }
 
