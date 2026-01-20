@@ -271,9 +271,7 @@ export function ChatInterface({
                         <div className="max-w-3xl mx-auto px-4 md:px-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="bg-white border-2 border-[#E8E1D5] rounded-3xl p-8 shadow-xl relative overflow-hidden">
                                 <div className="absolute -top-2 -right-2 w-32 h-32 bg-[#C41E3A]/5 rounded-bl-full flex items-center justify-center pt-2 pr-2">
-                                    <div className="text-4xl font-serif font-black text-[#C41E3A]">
-                                        {score}/100
-                                    </div>
+
                                 </div>
 
                                 <h3 className="text-2xl font-serif font-bold text-[#2C2C2C] mb-4 flex items-center gap-2">
