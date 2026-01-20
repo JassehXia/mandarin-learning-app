@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
@@ -25,9 +25,17 @@ model Scenario {
   difficulty  String @default("Beginner") // Beginner, Intermediate, Advanced
   location    String @default("Street")
   keyPhrases  Json?  @default("[]")
+  pathway     String @default("General") // Category for the tree branch
+
+  // Tree positioning (relative % or pixels)
+  x Float @default(0)
+  y Float @default(0)
 
   character   Character? @relation(fields: [characterId], references: [id])
   characterId String?
+
+  prerequisites Scenario[] @relation("ScenarioPrerequisites")
+  unlocks       Scenario[] @relation("ScenarioPrerequisites")
 
   conversations Conversation[]
 }
