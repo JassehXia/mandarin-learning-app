@@ -132,6 +132,112 @@ async function main() {
         }
     });
 
+
+    console.log("Creating Boba Shop Character...");
+    const mei = await prisma.character.create({
+        data: {
+            name: "Mei",
+            role: "Boba Shop Clerk",
+            personalityPrompt: "You are Mei, a young and trendy clerk at a popular bubble tea shop. You speak with high energy and use modern slang. You're very busy and expect customers to know their sugar level (táng dù) and ice level (bīng dù). You're helpful if they are confused but prefer quick orders.",
+        }
+    });
+
+    console.log("Creating Boba Order Scenario...");
+    await prisma.scenario.create({
+        data: {
+            title: "The Perfect Pearl",
+            description: "You're at a famous boba shop. The menu is huge, but you just want a classic pearl milk tea. Order it exactly how you like it.",
+            objective: "Order a pearl milk tea (zhēnzhū nǎichá) and specify your sugar and ice preferences.",
+            difficulty: "Beginner",
+            location: "Milk Tea Shop",
+            characterId: mei.id,
+        }
+    });
+
+    console.log("Creating Hotel Manager...");
+    const managerLin = await prisma.character.create({
+        data: {
+            name: "Manager Lin",
+            role: "Hotel Receptionist",
+            personalityPrompt: "You are Manager Lin, a professional and extremely polite receptionist at a high-end hotel in Beijing. You speak formal Mandarin (using 'nín' instead of 'nǐ'). You are patient and detail-oriented. You need to verify the guest's name and reservation details.",
+        }
+    });
+
+    console.log("Creating Hotel Check-in Scenario...");
+    await prisma.scenario.create({
+        data: {
+            title: "Midnight Check-in",
+            description: "You've just arrived at your hotel after a long flight. You're tired but need to check in. You have a reservation under your name.",
+            objective: "Introduce yourself, state that you have a reservation (yùdìng), and successfully receive your room key.",
+            difficulty: "Beginner",
+            location: "Hotel Lobby",
+            characterId: managerLin.id,
+        }
+    });
+
+    console.log("Creating Pharmacist...");
+    const pharmacistWang = await prisma.character.create({
+        data: {
+            name: "Pharmacist Wang",
+            role: "Pharmacist",
+            personalityPrompt: "You are Pharmacist Wang, a knowledgeable and cautious pharmacist. You speak in a calm, professional tone. You want to make sure the user is safe, so you might ask about their symptoms (zhèngzhuàng) before giving them medicine (yào).",
+        }
+    });
+
+    console.log("Creating Pharmacy Scenario...");
+    await prisma.scenario.create({
+        data: {
+            title: "The Headache Cure",
+            description: "You woke up with a splitting headache. You find a local pharmacy (yuèfáng) and need to buy some pain relievers.",
+            objective: "Describe your headache (tóutèng) to Pharmacist Wang and successfully purchase medicine.",
+            difficulty: "Beginner",
+            location: "Pharmacy",
+            characterId: pharmacistWang.id,
+        }
+    });
+
+    console.log("Creating Market Vendor...");
+    const laoLi = await prisma.character.create({
+        data: {
+            name: "Lao Li",
+            role: "Souvenir Vendor",
+            personalityPrompt: "You are Lao Li, a crafty and seasoned vendor at a Silk Market. You start with high prices and love to 'perform' the bargaining process. You are friendly but will act shocked if the user offers too low a price. You'll use phrases like 'too expensive' (tài guì le) and 'make it cheaper' (piányi yīdiǎn).",
+        }
+    });
+
+    console.log("Creating Bargaining Scenario...");
+    await prisma.scenario.create({
+        data: {
+            title: "The Art of the Deal",
+            description: "You see a beautiful silk scarf that Lao Li says costs 500 RMB. That's way too much. Use your skills to get a better price.",
+            objective: "Successfully negotiate with Lao Li to lower the price of the scarf and finalize the purchase at a fair rate.",
+            difficulty: "Intermediate",
+            location: "Souvenir Market",
+            characterId: laoLi.id,
+        }
+    });
+
+    console.log("Creating Police Officer...");
+    const officerGao = await prisma.character.create({
+        data: {
+            name: "Officer Gao",
+            role: "Police Officer",
+            personalityPrompt: "You are Officer Gao, a serious but helpful police officer at a busy railway station. You follow protocol and need precise information. You speak in a formal, authoritative tone. You will ask for specific descriptions (color, size, contents) and timings.",
+        }
+    });
+
+    console.log("Creating Lost Bag Scenario...");
+    await prisma.scenario.create({
+        data: {
+            title: "Emergency at the Station",
+            description: "You've lost your backpack at the crowded Beijing Railway Station. Your passport might be inside. You find an officer to report the loss.",
+            objective: "Report your lost bag (diū le bāobāo) to Officer Gao, describe it in detail (color, contents), and tell him where you last saw it.",
+            difficulty: "Advanced",
+            location: "Railway Station",
+            characterId: officerGao.id,
+        }
+    });
+
     console.log("Seeding completed.");
     console.log("Created Scenario:", airportScenario.title);
 }
