@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
+import { Send, Sparkles, Keyboard, Info } from "lucide-react";
+import { convertToToneMarks } from "@/lib/pinyin-input-util";
+import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
     input: string;
@@ -19,27 +22,64 @@ export function ChatInput({
     disabled,
     isLoading
 }: ChatInputProps) {
+    const [isToneMode, setIsToneMode] = useState(true);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value;
+        if (isToneMode) {
+            val = convertToToneMarks(val);
+        }
+        setInput(val);
+    };
+
     return (
-        <div className="border-t border-[#E8E1D5] bg-white p-4 pb-6 md:pb-8">
-            <form onSubmit={onSubmit} className="mx-auto flex max-w-3xl gap-4">
-                <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type your response..."
-                    className="flex-1 border-[#E8E1D5] bg-[#FDFBF7] text-lg h-12 focus-visible:ring-[#C41E3A]"
-                    autoFocus
-                    disabled={disabled}
-                />
-                <Button
-                    type="submit"
-                    size="icon"
-                    className="h-12 w-12 shrink-0 bg-[#C41E3A] hover:bg-[#A01818] text-white rounded-full transition-all shadow-md hover:scale-105"
-                    disabled={disabled}
-                >
-                    <Send className="h-5 w-5" />
-                    <span className="sr-only">Send</span>
-                </Button>
-            </form>
+        <div className="border-t border-[#E8E1D5] bg-white p-4 pb-4 md:pb-6">
+            <div className="mx-auto max-w-3xl">
+                <form onSubmit={onSubmit} className="flex gap-4 items-center">
+                    <div className="relative flex-1 group">
+                        <Input
+                            value={input}
+                            onChange={handleInputChange}
+                            placeholder="Type your response..."
+                            className="w-full border-[#E8E1D5] bg-[#FDFBF7] text-lg h-12 pr-12 focus-visible:ring-[#C41E3A] rounded-2xl shadow-sm transition-all"
+                            autoFocus
+                            disabled={disabled}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setIsToneMode(!isToneMode)}
+                            className={cn(
+                                "absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all",
+                                isToneMode
+                                    ? "bg-[#C41E3A]/10 text-[#C41E3A] hover:bg-[#C41E3A]/20"
+                                    : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                            )}
+                            title={isToneMode ? "Tone marks enabled (ni3 -> nǐ)" : "Tone marks disabled"}
+                        >
+                            <Keyboard className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <Button
+                        type="submit"
+                        size="icon"
+                        className="h-12 w-12 shrink-0 bg-[#C41E3A] hover:bg-[#A01830] text-white rounded-2xl transition-all shadow-md hover:scale-105 active:scale-95 disabled:opacity-50"
+                        disabled={disabled || !input.trim() || isLoading}
+                    >
+                        <Send className="h-5 w-5" />
+                        <span className="sr-only">Send</span>
+                    </Button>
+                </form>
+
+                {isToneMode && (
+                    <div className="mt-3 flex items-center justify-center gap-2 text-[10px] font-bold text-[#A6892C] uppercase tracking-widest animate-in fade-in slide-in-from-top-1 duration-500">
+                        <Info className="w-3 h-3" />
+                        <span>Tip: Type numbers for tones (e.g., "ni3" → "nǐ")</span>
+                        <div className="w-1 h-1 rounded-full bg-[#E8E1D5] mx-1" />
+                        <span>Type "v" for "ü"</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
