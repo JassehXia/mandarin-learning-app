@@ -37,7 +37,7 @@ Instructions:
 
 IMPORTANT: You must return your response in a strict JSON format:
 {
-  "content": "The Mandarin response (Hanzi)",
+  "content": "The Mandarin response (Hanzi, no spaces)",
   "translation": "The English translation",
   "status": "ACTIVE" | "COMPLETED" | "FAILED"
 }
@@ -113,7 +113,7 @@ You must return your response in a strict JSON format:
   "corrections": [
     {
       "original": "The user's original incorrect/awkward Mandarin",
-      "correction": "The ideal/correct Mandarin",
+      "correction": "The ideal/correct Mandarin (Hanzi, no spaces)",
       "pinyin": "Pinyin for the correction",
       "translation": "English translation for the correction",
       "explanation": "Briefly why this is better (in English)"
@@ -121,7 +121,7 @@ You must return your response in a strict JSON format:
   ],
   "suggestedFlashcards": [
     {
-      "hanzi": "Mandarin characters",
+      "hanzi": "Mandarin characters (no spaces)",
       "pinyin": "Pinyin with tones",
       "meaning": "English meaning",
       "explanation": "Context or usage note"

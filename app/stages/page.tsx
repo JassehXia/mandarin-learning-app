@@ -15,7 +15,7 @@ export default async function StagesPage() {
         include: {
             character: true,
             prerequisites: {
-                select: { id: true }
+                select: { id: true, title: true }
             },
             unlocks: {
                 select: { id: true }

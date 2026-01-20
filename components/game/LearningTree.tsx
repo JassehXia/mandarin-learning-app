@@ -19,11 +19,16 @@ export function LearningTree({ scenarios, completedScenarioIds }: LearningTreePr
             const isUnlocked = prerequisites.length === 0 ||
                 prerequisites.every((p: any) => completedScenarioIds.has(p.id));
 
+            // Track missing prerequisites (titles)
+            const missingPrerequisites = prerequisites
+                .filter((p: any) => !completedScenarioIds.has(p.id))
+                .map((p: any) => p.title);
+
             let status: "locked" | "available" | "completed" = "locked";
             if (isCompleted) status = "completed";
             else if (isUnlocked) status = "available";
 
-            return { ...scenario, status };
+            return { ...scenario, status, missingPrerequisites };
         });
     }, [scenarios, completedScenarioIds]);
 

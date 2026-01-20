@@ -19,7 +19,7 @@ export function TreeNode({ scenario, status }: TreeNodeProps) {
         <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            whileHover={!isLocked ? { scale: 1.05, y: -5 } : {}}
+            whileHover={{ scale: 1.05, y: -5 }}
             className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
             style={{ left: `${scenario.x}%`, top: `${scenario.y * 10}px` }} // Using y as a multiplier for vertical spacing
         >
@@ -63,22 +63,43 @@ export function TreeNode({ scenario, status }: TreeNodeProps) {
                 </div>
 
                 {/* Hover Details Popover */}
-                {!isLocked && (
-                    <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 w-64 p-4 bg-white rounded-2xl shadow-2xl border border-[#E8E1D5] opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none scale-90 group-hover:scale-100 z-50">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-[#FDFBF7] flex items-center justify-center border border-[#E8E1D5]">
-                                <User className="w-4 h-4 text-[#C41E3A]" />
+                <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 w-64 p-4 bg-white rounded-2xl shadow-2xl border border-[#E8E1D5] opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none scale-90 group-hover:scale-100 z-50">
+                    {isLocked ? (
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                                    <Lock className="w-4 h-4 text-gray-400" />
+                                </div>
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Locked Stage</p>
                             </div>
-                            <p className="text-xs font-bold text-[#5C4B3A]">{scenario.character?.name}</p>
+                            <p className="text-xs text-[#8A7E72] mb-3">To unlock this challenge, you must first complete:</p>
+                            <div className="space-y-1.5">
+                                {scenario.missingPrerequisites?.map((title: string, i: number) => (
+                                    <div key={i} className="flex items-start gap-2 text-[11px] font-bold text-[#C41E3A] bg-[#C41E3A]/5 px-2 py-1 rounded-lg">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[#C41E3A] mt-1.5 shrink-0" />
+                                        <span>{title}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <p className="text-xs text-[#8A7E72] leading-relaxed mb-3">{scenario.description}</p>
-                        <div className="flex items-center gap-1 text-[10px] text-[#A6892C] font-bold">
-                            <MapPin className="w-3 h-3" />
-                            <span>{scenario.location}</span>
-                        </div>
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white" />
-                    </div>
-                )}
+                    ) : (
+                        <>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-8 h-8 rounded-full bg-[#FDFBF7] flex items-center justify-center border border-[#E8E1D5]">
+                                    <User className="w-4 h-4 text-[#C41E3A]" />
+                                </div>
+                                <p className="text-xs font-bold text-[#5C4B3A]">{scenario.character?.name}</p>
+                            </div>
+                            <p className="text-xs text-[#8A7E72] leading-relaxed mb-3">{scenario.description}</p>
+                            <div className="flex items-center gap-1 text-[10px] text-[#A6892C] font-bold">
+                                <MapPin className="w-3 h-3" />
+                                <span>{scenario.location}</span>
+                            </div>
+                        </>
+                    )}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white" />
+                </div>
+
             </div>
         </motion.div>
     );

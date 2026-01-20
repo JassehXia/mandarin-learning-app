@@ -84,7 +84,8 @@ export async function submitMessage(conversationId: string, content: string) {
     const aiResponse = await chatWithCharacter(history, character.personalityPrompt, scenario.objective);
 
     // 5. Generate Pinyin Server-Side
-    const responsePinyin = pinyin(aiResponse.content);
+    const cleanedContent = aiResponse.content.replace(/\s+/g, '');
+    const responsePinyin = pinyin(cleanedContent);
 
     // 6. Save AI Response
     const newMessage = await db.message.create({
@@ -115,8 +116,8 @@ export async function submitMessage(conversationId: string, content: string) {
         // Enrich corrections with pinyin-pro for accuracy
         const enrichedCorrections = coachReport.corrections.map(c => ({
             ...c,
-            originalPinyin: pinyin(c.original),
-            correctionPinyin: pinyin(c.correction)
+            originalPinyin: pinyin(c.original.replace(/\s+/g, '')),
+            correctionPinyin: pinyin(c.correction.replace(/\s+/g, ''))
         }));
 
         feedback = coachReport.feedback;
