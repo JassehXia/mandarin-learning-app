@@ -41,3 +41,15 @@ export async function saveFlashcardsBatch(flashcards: {
 
     return created;
 }
+
+export async function getUserFlashcards() {
+    const user = await getOrCreateUser();
+    if (!user) return [];
+
+    const flashcards = await db.flashcard.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    return flashcards;
+}
