@@ -297,17 +297,39 @@ export function ChatInterface({
                                             {corrections.map((c: any, i: number) => (
                                                 <div key={i} className="bg-[#FDFBF7] border border-[#E8E1D5] rounded-xl p-4">
                                                     <div className="flex flex-col gap-2 mb-3">
-                                                        <div className="flex flex-col opacity-60">
-                                                            <span className="text-xs font-bold text-red-500/70 uppercase tracking-tighter mb-0.5">Your Phrase</span>
-                                                            <span className="text-sm line-through decoration-red-200">{c.original}</span>
-                                                            <span className="text-[10px] text-gray-400 font-medium italic">{c.originalPinyin}</span>
+                                                        <div className="flex justify-between items-start group/corr-user">
+                                                            <div className="flex flex-col opacity-60">
+                                                                <span className="text-xs font-bold text-red-500/70 uppercase tracking-tighter mb-0.5">Your Phrase</span>
+                                                                <span className="text-sm line-through decoration-red-200">{c.original}</span>
+                                                                <span className="text-[10px] text-gray-400 font-medium italic">{c.originalPinyin}</span>
+                                                            </div>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => playText(c.original, `orig-${i}`)}
+                                                                className={`h-6 w-6 rounded-full opacity-0 group-hover/corr-user:opacity-100 transition-opacity ${isPlaying === `orig-${i}` ? "opacity-100 text-[#C41E3A] bg-[#C41E3A]/5" : "text-gray-400 hover:text-[#C41E3A] hover:bg-[#C41E3A]/5"}`}
+                                                            >
+                                                                <Volume2 className={`w-3 h-3 ${isPlaying === `orig-${i}` ? "animate-pulse" : ""}`} />
+                                                            </Button>
                                                         </div>
+
                                                         <div className="h-px bg-[#E8E1D5]/50 w-full my-1" />
-                                                        <div className="flex flex-col">
-                                                            <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-tighter mb-0.5">Better Way</span>
-                                                            <span className="text-lg font-bold text-[#2C2C2C] leading-tight">{c.correction}</span>
-                                                            <span className="text-xs text-[#C41E3A] font-semibold tracking-wide">{c.correctionPinyin}</span>
-                                                            <span className="text-xs text-gray-400 italic mt-0.5">{c.translation}</span>
+
+                                                        <div className="flex justify-between items-start group/corr-better">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-tighter mb-0.5">Better Way</span>
+                                                                <span className="text-lg font-bold text-[#2C2C2C] leading-tight">{c.correction}</span>
+                                                                <span className="text-xs text-[#C41E3A] font-semibold tracking-wide">{c.correctionPinyin}</span>
+                                                                <span className="text-xs text-gray-400 italic mt-0.5">{c.translation}</span>
+                                                            </div>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="icon"
+                                                                onClick={() => playText(c.correction, `corr-${i}`)}
+                                                                className={`h-8 w-8 rounded-full transition-all border-[#E8E1D5] ${isPlaying === `corr-${i}` ? "bg-[#C41E3A]/10 text-[#C41E3A] border-[#C41E3A]" : "bg-white text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5"}`}
+                                                            >
+                                                                <Volume2 className={`w-4 h-4 ${isPlaying === `corr-${i}` ? "animate-pulse" : ""}`} />
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                     <p className="text-sm text-[#5C4B3A] leading-relaxed border-t border-[#E8E1D5] pt-2 font-medium bg-white/50 -mx-4 px-4 rounded-b-xl">{c.explanation}</p>
