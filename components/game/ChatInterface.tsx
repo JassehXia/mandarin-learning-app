@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MapPin, RotateCcw, Languages, Volume2, Lightbulb } from "lucide-react";
-import { submitMessage, restartGame } from "@/actions/game";
+import { submitMessage } from "@/actions/game";
+import { ChatHUD } from "./ChatHUD";
+import { CheatSheetPanel } from "./CheatSheetPanel";
+import { MessageItem } from "./MessageItem";
+import { CoachReport } from "./CoachReport";
+import { ChatInput } from "./ChatInput";
 
 interface Message {
     id: string;
@@ -71,30 +73,18 @@ export function ChatInterface({
 
     const playText = (text: string, id: string) => {
         if (!window.speechSynthesis) return;
-
-        // Stop any current speech
         window.speechSynthesis.cancel();
         setIsPlaying(id);
-
         const utterance = new SpeechSynthesisUtterance(text);
-
-        // Try to find a Chinese voice
         const voices = window.speechSynthesis.getVoices();
         const zhVoice = voices.find(v => v.lang.includes('zh-CN') || v.lang.includes('zh-TW')) || voices.find(v => v.lang.includes('zh'));
-
-        if (zhVoice) {
-            utterance.voice = zhVoice;
-        }
-
+        if (zhVoice) utterance.voice = zhVoice;
         utterance.onend = () => setIsPlaying(null);
         utterance.onerror = () => setIsPlaying(null);
-
         window.speechSynthesis.speak(utterance);
     };
 
-    // Auto-scroll to bottom
     useEffect(() => {
-        // A small timeout helps with scroll after render
         const timeout = setTimeout(() => {
             if (scrollRef.current) {
                 scrollRef.current.scrollIntoView({ behavior: "smooth" });
@@ -115,8 +105,6 @@ export function ChatInterface({
 
         try {
             const result = await submitMessage(conversationId, userMsg.content);
-
-            // Add AI response
             const aiMsg: Message = {
                 id: result.message.id,
                 role: "assistant",
@@ -126,16 +114,12 @@ export function ChatInterface({
             };
             setMessages((prev) => [...prev, aiMsg]);
 
-            if (result.status !== gameStatus) {
-                setGameStatus(result.status);
-            }
+            if (result.status !== gameStatus) setGameStatus(result.status);
             if (result.score !== null) setScore(result.score);
             if (result.feedback !== null) setFeedback(result.feedback);
             if (result.corrections) setCorrections(result.corrections);
-
         } catch (error) {
             console.error("Failed to send message", error);
-            // Remove optimistic message on failure? Or show error state.
         } finally {
             setIsLoading(false);
         }
@@ -143,95 +127,24 @@ export function ChatInterface({
 
     return (
         <div className="flex h-screen flex-col bg-[#FDFBF7] text-[#2C2C2C] font-sans">
-            {/* HUD Header */}
-            <header className="flex items-center justify-between border-b border-[#E8E1D5] bg-white px-4 md:px-6 py-4 shadow-sm z-10">
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 text-[#C41E3A] font-serif font-bold">
-                        <MapPin className="h-5 w-5" />
-                        <span>{scenario.location}</span>
-                    </div>
-                    <div className="hidden md:block h-4 w-px bg-[#E8E1D5]" />
-                    <div className="hidden md:block text-[#5C4B3A] text-sm">
-                        <span className="font-bold mr-2 text-[#D4AF37]">Objective:</span>
-                        {scenario.objective}
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowCheatSheet(!showCheatSheet)}
-                        className={`gap-2 ${showCheatSheet ? "text-[#C41E3A] bg-[#C41E3A]/5" : "text-[#8A7E72] hover:text-[#C41E3A]"}`}
-                    >
-                        <Lightbulb className="h-4 w-4" />
-                        <span className="hidden sm:inline">Cheat Sheet</span>
-                    </Button>
+            <ChatHUD
+                location={scenario.location}
+                objective={scenario.objective}
+                conversationId={conversationId}
+                scenarioId={scenario.id}
+                gameStatus={gameStatus}
+                isLoading={isLoading}
+                showCheatSheet={showCheatSheet}
+                onToggleCheatSheet={() => setShowCheatSheet(!showCheatSheet)}
+            />
 
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                            if (confirm("Are you sure you want to start over? Your progress will be lost.")) {
-                                window.location.reload(); // Simple way to trigger fresh startGame call
-                                // We'll actually implement a clean restart action call here
-                                await restartGame(conversationId, scenario.id);
-                                window.location.href = `/play/${scenario.id}`;
-                            }
-                        }}
-                        className="text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 gap-2"
-                        disabled={isLoading}
-                    >
-                        <RotateCcw className="h-4 w-4" />
-                        <span className="hidden sm:inline">Start Over</span>
-                    </Button>
-
-                    {/* Status Indicator */}
-                    {gameStatus === "COMPLETED" && (
-                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold uppercase tracking-wider">Success</span>
-                    )}
-                    {gameStatus === "ACTIVE" && (
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold uppercase tracking-wider">Active</span>
-                    )}
-                    {gameStatus === "FAILED" && (
-                        <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-bold uppercase tracking-wider">Failed</span>
-                    )}
-                </div>
-            </header>
-
-
-            {/* Chat Area */}
             <div className="flex-1 relative overflow-hidden flex flex-col">
-                {/* Cheat Sheet Panel */}
-                {showCheatSheet && scenario.keyPhrases && (
-                    <div className="absolute top-0 inset-x-0 bg-white/95 backdrop-blur-md border-b border-[#E8E1D5] p-6 z-20 shadow-lg animate-in slide-in-from-top duration-300">
-                        <div className="max-w-3xl mx-auto">
-                            <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <Lightbulb className="w-3.5 h-3.5" />
-                                Useful Expressions
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {scenario.keyPhrases.map((kp: any, i: number) => (
-                                    <div key={i} className="flex items-start gap-3 bg-[#FDFBF7] p-3 rounded-xl border border-[#E8E1D5] hover:border-[#D4AF37]/50 transition-colors group">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => playText(kp.phrase, `cheat-${i}`)}
-                                            className="h-8 w-8 shrink-0 rounded-full hover:bg-[#C41E3A]/5 text-[#8A7E72] hover:text-[#C41E3A]"
-                                        >
-                                            <Volume2 className={`w-4 h-4 ${isPlaying === `cheat-${i}` ? "animate-pulse" : ""}`} />
-                                        </Button>
-                                        <div className="flex-1">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-bold text-[#2C2C2C]">{kp.phrase}</span>
-                                                <span className="text-[10px] text-[#C41E3A] font-medium">{kp.pinyin}</span>
-                                                <span className="text-xs text-gray-500 mt-0.5">{kp.translation}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                {showCheatSheet && (
+                    <CheatSheetPanel
+                        keyPhrases={scenario.keyPhrases}
+                        onPlayAudio={playText}
+                        isPlaying={isPlaying}
+                    />
                 )}
 
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm border border-[#E8E1D5] px-4 py-1 rounded-full text-xs text-[#5C4B3A] shadow-sm z-10 pointer-events-none">
@@ -241,63 +154,14 @@ export function ChatInterface({
                 <ScrollArea className="flex-1 px-4 md:px-6">
                     <div className="flex flex-col gap-6 max-w-3xl mx-auto pt-12 pb-4">
                         {messages.map((msg) => (
-                            <div
+                            <MessageItem
                                 key={msg.id}
-                                className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"
-                                    }`}
-                            >
-                                <div
-                                    className={`max-w-[85%] md:max-w-[70%] rounded-2xl px-5 py-3 text-lg leading-relaxed shadow-sm ${msg.role === "user"
-                                        ? "bg-[#C41E3A] text-white rounded-tr-none"
-                                        : "bg-white border border-[#E8E1D5] text-[#2C2C2C] rounded-tl-none"
-                                        }`}
-                                >
-                                    <div>{msg.content}</div>
-                                    {msg.role === "assistant" && (
-                                        <div className="mt-2 pt-2 border-t border-gray-100/50">
-                                            {msg.pinyin && (
-                                                <div className="text-sm text-gray-500 font-medium mb-1">{msg.pinyin}</div>
-                                            )}
-                                            {msg.translation && (
-                                                <div className="mt-1 flex items-center gap-2">
-                                                    {visibleTranslations.has(msg.id) ? (
-                                                        <div className="text-sm text-gray-400 italic bg-gray-50/50 p-2 rounded-lg border border-gray-100 relative group/trans flex-1">
-                                                            {msg.translation}
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => toggleTranslation(msg.id)}
-                                                                className="absolute top-1 right-1 opacity-0 group-hover/trans:opacity-100 transition-opacity text-[10px] text-gray-300 hover:text-[#C41E3A]"
-                                                                title="Hide Translation"
-                                                            >
-                                                                Hide
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => toggleTranslation(msg.id)}
-                                                            className="h-7 text-[10px] text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 gap-1.5 px-2 mt-1"
-                                                        >
-                                                            <Languages className="w-3 h-3" />
-                                                            Show Translation
-                                                        </Button>
-                                                    )}
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        onClick={() => playText(msg.content, msg.id)}
-                                                        className={`h-7 w-7 rounded-full transition-colors border-[#E8E1D5] ${isPlaying === msg.id ? "bg-[#C41E3A]/10 text-[#C41E3A] border-[#C41E3A]" : "bg-white text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5"}`}
-                                                        title="Listen"
-                                                    >
-                                                        <Volume2 className={`w-3.5 h-3.5 ${isPlaying === msg.id ? "animate-pulse" : ""}`} />
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                                message={msg}
+                                onPlayAudio={playText}
+                                isPlaying={isPlaying}
+                                isTranslationVisible={visibleTranslations.has(msg.id)}
+                                onToggleTranslation={toggleTranslation}
+                            />
                         ))}
                         {isLoading && (
                             <div className="flex justify-start">
@@ -311,123 +175,28 @@ export function ChatInterface({
                         <div ref={scrollRef} className="h-4" />
                     </div>
 
-                    {/* Report Card Overlay */}
                     {gameStatus !== "ACTIVE" && feedback && (
-                        <div className="max-w-3xl mx-auto px-4 md:px-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="bg-white border-2 border-[#E8E1D5] rounded-3xl p-8 shadow-xl relative overflow-hidden">
-                                <div className="absolute -top-2 -right-2 w-32 h-32 bg-[#C41E3A]/5 rounded-bl-full flex items-center justify-center pt-2 pr-2">
-
-                                </div>
-
-                                <h3 className="text-2xl font-serif font-bold text-[#2C2C2C] mb-4 flex items-center gap-2">
-                                    Coach's Report
-                                    <span className={`text-sm px-3 py-1 rounded-full uppercase tracking-widest ${gameStatus === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                                        {gameStatus}
-                                    </span>
-                                </h3>
-
-                                <p className="text-[#5C4B3A] leading-relaxed italic text-lg mb-8">
-                                    "{feedback}"
-                                </p>
-
-                                {corrections && corrections.length > 0 && (
-                                    <div className="mb-8 space-y-4">
-                                        <h4 className="text-sm font-bold text-[#D4AF37] uppercase tracking-widest flex items-center gap-2">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
-                                            Key Corrections
-                                        </h4>
-                                        <div className="space-y-3">
-                                            {corrections.map((c: any, i: number) => (
-                                                <div key={i} className="bg-[#FDFBF7] border border-[#E8E1D5] rounded-xl p-4">
-                                                    <div className="flex flex-col gap-2 mb-3">
-                                                        <div className="flex justify-between items-start group/corr-user">
-                                                            <div className="flex flex-col opacity-60">
-                                                                <span className="text-xs font-bold text-red-500/70 uppercase tracking-tighter mb-0.5">Your Phrase</span>
-                                                                <span className="text-sm line-through decoration-red-200">{c.original}</span>
-                                                                <span className="text-[10px] text-gray-400 font-medium italic">{c.originalPinyin}</span>
-                                                            </div>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => playText(c.original, `orig-${i}`)}
-                                                                className={`h-6 w-6 rounded-full opacity-0 group-hover/corr-user:opacity-100 transition-opacity ${isPlaying === `orig-${i}` ? "opacity-100 text-[#C41E3A] bg-[#C41E3A]/5" : "text-gray-400 hover:text-[#C41E3A] hover:bg-[#C41E3A]/5"}`}
-                                                            >
-                                                                <Volume2 className={`w-3 h-3 ${isPlaying === `orig-${i}` ? "animate-pulse" : ""}`} />
-                                                            </Button>
-                                                        </div>
-
-                                                        <div className="h-px bg-[#E8E1D5]/50 w-full my-1" />
-
-                                                        <div className="flex justify-between items-start group/corr-better">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-tighter mb-0.5">Better Way</span>
-                                                                <span className="text-lg font-bold text-[#2C2C2C] leading-tight">{c.correction}</span>
-                                                                <span className="text-xs text-[#C41E3A] font-semibold tracking-wide">{c.correctionPinyin}</span>
-                                                                <span className="text-xs text-gray-400 italic mt-0.5">{c.translation}</span>
-                                                            </div>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="icon"
-                                                                onClick={() => playText(c.correction, `corr-${i}`)}
-                                                                className={`h-8 w-8 rounded-full transition-all border-[#E8E1D5] ${isPlaying === `corr-${i}` ? "bg-[#C41E3A]/10 text-[#C41E3A] border-[#C41E3A]" : "bg-white text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5"}`}
-                                                            >
-                                                                <Volume2 className={`w-4 h-4 ${isPlaying === `corr-${i}` ? "animate-pulse" : ""}`} />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    <p className="text-sm text-[#5C4B3A] leading-relaxed border-t border-[#E8E1D5] pt-2 font-medium bg-white/50 -mx-4 px-4 rounded-b-xl">{c.explanation}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="flex flex-col sm:flex-row gap-4">
-                                    <Button
-                                        onClick={async () => {
-                                            await restartGame(conversationId, scenario.id);
-                                            window.location.href = `/play/${scenario.id}`;
-                                        }}
-                                        className="flex-1 bg-[#C41E3A] hover:bg-[#A01830] text-white font-bold h-12 rounded-xl border-b-4 border-[#8A1529]"
-                                    >
-                                        Try Again
-                                    </Button>
-                                    <Button
-                                        onClick={() => window.location.href = '/stages'}
-                                        variant="outline"
-                                        className="flex-1 border-2 border-[#E8E1D5] text-[#5C4B3A] font-bold h-12 rounded-xl hover:bg-[#FDFBF7]"
-                                    >
-                                        Back to Stages
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
+                        <CoachReport
+                            status={gameStatus}
+                            score={score}
+                            feedback={feedback}
+                            corrections={corrections}
+                            conversationId={conversationId}
+                            scenarioId={scenario.id}
+                            onPlayAudio={playText}
+                            isPlaying={isPlaying}
+                        />
                     )}
                 </ScrollArea>
             </div>
 
-            {/* Input Area */}
-            <div className="border-t border-[#E8E1D5] bg-white p-4 pb-6 md:pb-8">
-                <form onSubmit={handleSubmit} className="mx-auto flex max-w-3xl gap-4">
-                    <Input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type your response..."
-                        className="flex-1 border-[#E8E1D5] bg-[#FDFBF7] text-lg h-12 focus-visible:ring-[#C41E3A]"
-                        autoFocus
-                        disabled={gameStatus !== "ACTIVE" || isLoading}
-                    />
-                    <Button
-                        type="submit"
-                        size="icon"
-                        className="h-12 w-12 shrink-0 bg-[#C41E3A] hover:bg-[#A01818] text-white rounded-full transition-all shadow-md hover:scale-105"
-                        disabled={gameStatus !== "ACTIVE" || isLoading}
-                    >
-                        <Send className="h-5 w-5" />
-                        <span className="sr-only">Send</span>
-                    </Button>
-                </form>
-            </div>
+            <ChatInput
+                input={input}
+                setInput={setInput}
+                onSubmit={handleSubmit}
+                disabled={gameStatus !== "ACTIVE" || isLoading}
+                isLoading={isLoading}
+            />
         </div>
     );
 }
