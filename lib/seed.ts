@@ -44,6 +44,12 @@ async function main() {
             difficulty: "Beginner",
             location: "Airport",
             characterId: driverZhang.id,
+            keyPhrases: [
+                { phrase: "我要去...", pinyin: "Wǒ yào qù...", translation: "I want to go to..." },
+                { phrase: "外滩", pinyin: "Wàitān", translation: "The Bund" },
+                { phrase: "多少钱？", pinyin: "Duōshǎo qián?", translation: "How much is it?" },
+                { phrase: "打表吗？", pinyin: "Dǎbiǎo ma?", translation: "Do you use the meter?" }
+            ]
         }
     });
 
@@ -58,7 +64,7 @@ async function main() {
     });
 
     console.log("Creating Night Market Scenario...");
-    const nightMarketScenario = await prisma.scenario.create({
+    await prisma.scenario.create({
         data: {
             title: "Night Market Feast",
             description: "You are starving at a night market. The smell of fresh dumplings is irresistible. Auntie Wang is looking at you expectantly.",
@@ -66,6 +72,12 @@ async function main() {
             difficulty: "Intermediate",
             location: "Night Market",
             characterId: auntieWang.id,
+            keyPhrases: [
+                { phrase: "我要一份饺子", pinyin: "Wǒ yào yī fèn jiǎozi", translation: "I want one serving of dumplings" },
+                { phrase: "猪肉韭菜", pinyin: "Zhūròu jiǔcài", translation: "Pork & Chive" },
+                { phrase: "不要辣", pinyin: "Bùyào là", translation: "No spicy sauce" },
+                { phrase: "可以用微信吗？", pinyin: "Kěyǐ yòng Wēixìn ma?", translation: "Can I use WeChat (Pay)?" }
+            ]
         }
     });
 
@@ -87,6 +99,12 @@ async function main() {
             difficulty: "Beginner",
             location: "Grocery Store",
             characterId: liJie.id,
+            keyPhrases: [
+                { phrase: "请问...", pinyin: "Qǐngwèn...", translation: "Excuse me / May I ask..." },
+                { phrase: "...在哪里？", pinyin: "...zài nǎlǐ?", translation: "Where is...?" },
+                { phrase: "香蕉", pinyin: "Xiāngjiāo", translation: "Banana" },
+                { phrase: "水果区", pinyin: "Shuǐguǒ qū", translation: "Fruit section" }
+            ]
         }
     });
 
@@ -108,6 +126,12 @@ async function main() {
             difficulty: "Intermediate",
             location: "Messaging App",
             characterId: xiaoMing.id,
+            keyPhrases: [
+                { phrase: "你周末有空吗？", pinyin: "Nǐ zhōumò yǒu kòng ma?", translation: "Are you free this weekend?" },
+                { phrase: "我们几点见面？", pinyin: "Wǒmen jǐ diǎn jiànmiàn?", translation: "What time shall we meet?" },
+                { phrase: "在哪里见面？", pinyin: "Zài nǎlǐ jiànmiàn?", translation: "Where shall we meet?" },
+                { phrase: "不见不散", pinyin: "Bùjiàn bùsàn", translation: "Be there or be square" }
+            ]
         }
     });
 
@@ -129,9 +153,16 @@ async function main() {
             difficulty: "Beginner",
             location: "City Street",
             characterId: mrChen.id,
+            keyPhrases: [
+                { phrase: "咖啡店", pinyin: "Kāfēi diàn", translation: "Coffee shop" },
+                { phrase: "一直走", pinyin: "Yīzhí zǒu", translation: "Go straight" },
+                { phrase: "左转 / 右转", pinyin: "Zuǒ zhuǎn / Yòu zhuǎn", translation: "Turn left / Turn right" },
+                { phrase: "谢谢您的帮助", pinyin: "Xièxiè nín de bāngzhù", translation: "Thank you for your help" }
+            ]
         }
     });
 
+    // --- NEW SCENARIOS ---
 
     console.log("Creating Boba Shop Character...");
     const mei = await prisma.character.create({
@@ -151,6 +182,12 @@ async function main() {
             difficulty: "Beginner",
             location: "Milk Tea Shop",
             characterId: mei.id,
+            keyPhrases: [
+                { phrase: "珍珠奶茶", pinyin: "Zhēnzhū nǎichá", translation: "Pearl milk tea" },
+                { phrase: "半糖", pinyin: "Bàn táng", translation: "Half sugar" },
+                { phrase: "少冰", pinyin: "Shǎo bīng", translation: "Less ice" },
+                { phrase: "打包", pinyin: "Dǎbāo", translation: "To go / Take away" }
+            ]
         }
     });
 
@@ -172,6 +209,12 @@ async function main() {
             difficulty: "Beginner",
             location: "Hotel Lobby",
             characterId: managerLin.id,
+            keyPhrases: [
+                { phrase: "我要办理入住", pinyin: "Wǒ yào bànlǐ rùzhù", translation: "I want to check in" },
+                { phrase: "我有预订", pinyin: "Wǒ yǒu yùdìng", translation: "I have a reservation" },
+                { phrase: "这是我的护照", pinyin: "Zhè shì wǒ de hùzhào", translation: "This is my passport" },
+                { phrase: "房卡", pinyin: "Fáng kǎ", translation: "Room card / key" }
+            ]
         }
     });
 
@@ -193,6 +236,12 @@ async function main() {
             difficulty: "Beginner",
             location: "Pharmacy",
             characterId: pharmacistWang.id,
+            keyPhrases: [
+                { phrase: "我头疼", pinyin: "Wǒ tóuténg", translation: "I have a headache" },
+                { phrase: "止疼药", pinyin: "Zhǐténg yào", translation: "Painkiller" },
+                { phrase: "怎么吃？", pinyin: "Zěnme chī?", translation: "How do I take it?" },
+                { phrase: "一天三次", pinyin: "Yītiān sāncì", translation: "Three times a day" }
+            ]
         }
     });
 
@@ -214,6 +263,12 @@ async function main() {
             difficulty: "Intermediate",
             location: "Souvenir Market",
             characterId: laoLi.id,
+            keyPhrases: [
+                { phrase: "太贵了！", pinyin: "Tài guì le!", translation: "Too expensive!" },
+                { phrase: "便宜一点吧", pinyin: "Piányi yīdiǎn ba", translation: "Make it cheaper / Give me a discount" },
+                { phrase: "最低多少钱？", pinyin: "Zuìdī duōshǎo qián?", translation: "What's the lowest price?" },
+                { phrase: "那我不买了", pinyin: "Nà wǒ bù mǎi le", translation: "Then I won't buy it (walking away tactic)" }
+            ]
         }
     });
 
@@ -235,6 +290,12 @@ async function main() {
             difficulty: "Advanced",
             location: "Railway Station",
             characterId: officerGao.id,
+            keyPhrases: [
+                { phrase: "我丢了包包", pinyin: "Wǒ diūle bāobāo", translation: "I lost my bag" },
+                { phrase: "里面有护照", pinyin: "Lǐmiàn yǒu hùzhào", translation: "Inside has my passport" },
+                { phrase: "黑色的", pinyin: "Hēisè de", translation: "Black color" },
+                { phrase: "我最后在...看见它", pinyin: "Wǒ zuìhòu zài... kànjiàn tā", translation: "I last saw it at..." }
+            ]
         }
     });
 

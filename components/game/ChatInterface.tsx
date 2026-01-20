@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MapPin, RotateCcw, Languages, Volume2 } from "lucide-react";
+import { Send, MapPin, RotateCcw, Languages, Volume2, Lightbulb } from "lucide-react";
 import { submitMessage, restartGame } from "@/actions/game";
 
 interface Message {
@@ -27,6 +27,7 @@ interface ChatInterfaceProps {
         title: string;
         objective: string;
         location: string;
+        keyPhrases?: any;
         character: {
             name: string;
             role: string;
@@ -53,6 +54,7 @@ export function ChatInterface({
     const [corrections, setCorrections] = useState<any[]>(initialCorrections || []);
     const [visibleTranslations, setVisibleTranslations] = useState<Set<string>>(new Set());
     const [isPlaying, setIsPlaying] = useState<string | null>(null);
+    const [showCheatSheet, setShowCheatSheet] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const toggleTranslation = (id: string) => {
@@ -158,6 +160,16 @@ export function ChatInterface({
                     <Button
                         variant="ghost"
                         size="sm"
+                        onClick={() => setShowCheatSheet(!showCheatSheet)}
+                        className={`gap-2 ${showCheatSheet ? "text-[#C41E3A] bg-[#C41E3A]/5" : "text-[#8A7E72] hover:text-[#C41E3A]"}`}
+                    >
+                        <Lightbulb className="h-4 w-4" />
+                        <span className="hidden sm:inline">Cheat Sheet</span>
+                    </Button>
+
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={async () => {
                             if (confirm("Are you sure you want to start over? Your progress will be lost.")) {
                                 window.location.reload(); // Simple way to trigger fresh startGame call
@@ -189,6 +201,39 @@ export function ChatInterface({
 
             {/* Chat Area */}
             <div className="flex-1 relative overflow-hidden flex flex-col">
+                {/* Cheat Sheet Panel */}
+                {showCheatSheet && scenario.keyPhrases && (
+                    <div className="absolute top-0 inset-x-0 bg-white/95 backdrop-blur-md border-b border-[#E8E1D5] p-6 z-20 shadow-lg animate-in slide-in-from-top duration-300">
+                        <div className="max-w-3xl mx-auto">
+                            <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <Lightbulb className="w-3.5 h-3.5" />
+                                Useful Expressions
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {scenario.keyPhrases.map((kp: any, i: number) => (
+                                    <div key={i} className="flex items-start gap-3 bg-[#FDFBF7] p-3 rounded-xl border border-[#E8E1D5] hover:border-[#D4AF37]/50 transition-colors group">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => playText(kp.phrase, `cheat-${i}`)}
+                                            className="h-8 w-8 shrink-0 rounded-full hover:bg-[#C41E3A]/5 text-[#8A7E72] hover:text-[#C41E3A]"
+                                        >
+                                            <Volume2 className={`w-4 h-4 ${isPlaying === `cheat-${i}` ? "animate-pulse" : ""}`} />
+                                        </Button>
+                                        <div className="flex-1">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-[#2C2C2C]">{kp.phrase}</span>
+                                                <span className="text-[10px] text-[#C41E3A] font-medium">{kp.pinyin}</span>
+                                                <span className="text-xs text-gray-500 mt-0.5">{kp.translation}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm border border-[#E8E1D5] px-4 py-1 rounded-full text-xs text-[#5C4B3A] shadow-sm z-10 pointer-events-none">
                     Talking to: <span className="font-bold text-[#C41E3A]">{scenario.character.name}</span> ({scenario.character.role})
                 </div>

@@ -23,6 +23,7 @@ model Scenario {
   objective   String @default("Complete the conversation naturally.")
   difficulty  String @default("Beginner") // Beginner, Intermediate, Advanced
   location    String @default("Street")
+  keyPhrases  Json?  @default("[]")
 
   character   Character? @relation(fields: [characterId], references: [id])
   characterId String?

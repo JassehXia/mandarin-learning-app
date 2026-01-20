@@ -62,6 +62,7 @@ export default async function PlayPage({ params }: { params: { scenarioId: strin
                 title: fullConversation.scenario.title,
                 objective: fullConversation.scenario.objective,
                 location: fullConversation.scenario.location,
+                keyPhrases: fullConversation.scenario.keyPhrases,
                 character: {
                     name: fullConversation.scenario.character?.name || "Unknown",
                     role: fullConversation.scenario.character?.role || "Local",
