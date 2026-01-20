@@ -77,7 +77,7 @@ export async function generateFeedback(
     history: ChatMessage[],
     scenarioTitle: string,
     objective: string
-): Promise<{ score: number; feedback: string; corrections: { original: string; correction: string; pinyin: string; explanation: string }[] }> {
+): Promise<{ score: number; feedback: string; corrections: { original: string; correction: string; pinyin: string; translation: string; explanation: string }[] }> {
     const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
@@ -107,6 +107,7 @@ You must return your response in a strict JSON format:
       "original": "The user's original incorrect/awkward Mandarin",
       "correction": "The ideal/correct Mandarin",
       "pinyin": "Pinyin for the correction",
+      "translation": "English translation for the correction",
       "explanation": "Briefly why this is better (in English)"
     }
   ]

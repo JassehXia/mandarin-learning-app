@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MapPin, RotateCcw, Languages } from "lucide-react";
+import { Send, MapPin, RotateCcw, Languages, Volume2 } from "lucide-react";
 import { submitMessage, restartGame } from "@/actions/game";
 
 interface Message {
@@ -52,6 +52,7 @@ export function ChatInterface({
     const [feedback, setFeedback] = useState<string | null>(initialFeedback || null);
     const [corrections, setCorrections] = useState<any[]>(initialCorrections || []);
     const [visibleTranslations, setVisibleTranslations] = useState<Set<string>>(new Set());
+    const [isPlaying, setIsPlaying] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const toggleTranslation = (id: string) => {
@@ -64,6 +65,29 @@ export function ChatInterface({
             }
             return next;
         });
+    };
+
+    const playText = (text: string, id: string) => {
+        if (!window.speechSynthesis) return;
+
+        // Stop any current speech
+        window.speechSynthesis.cancel();
+        setIsPlaying(id);
+
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // Try to find a Chinese voice
+        const voices = window.speechSynthesis.getVoices();
+        const zhVoice = voices.find(v => v.lang.includes('zh-CN') || v.lang.includes('zh-TW')) || voices.find(v => v.lang.includes('zh'));
+
+        if (zhVoice) {
+            utterance.voice = zhVoice;
+        }
+
+        utterance.onend = () => setIsPlaying(null);
+        utterance.onerror = () => setIsPlaying(null);
+
+        window.speechSynthesis.speak(utterance);
     };
 
     // Auto-scroll to bottom
@@ -190,9 +214,9 @@ export function ChatInterface({
                                                 <div className="text-sm text-gray-500 font-medium mb-1">{msg.pinyin}</div>
                                             )}
                                             {msg.translation && (
-                                                <div className="mt-1">
+                                                <div className="mt-1 flex items-center gap-2">
                                                     {visibleTranslations.has(msg.id) ? (
-                                                        <div className="text-sm text-gray-400 italic bg-gray-50/50 p-2 rounded-lg border border-gray-100 relative group/trans">
+                                                        <div className="text-sm text-gray-400 italic bg-gray-50/50 p-2 rounded-lg border border-gray-100 relative group/trans flex-1">
                                                             {msg.translation}
                                                             <button
                                                                 type="button"
@@ -208,12 +232,21 @@ export function ChatInterface({
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => toggleTranslation(msg.id)}
-                                                            className="h-7 text-[10px] text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 gap-1.5 self-start px-2 mt-1"
+                                                            className="h-7 text-[10px] text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 gap-1.5 px-2 mt-1"
                                                         >
                                                             <Languages className="w-3 h-3" />
                                                             Show Translation
                                                         </Button>
                                                     )}
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        onClick={() => playText(msg.content, msg.id)}
+                                                        className={`h-7 w-7 rounded-full transition-colors border-[#E8E1D5] ${isPlaying === msg.id ? "bg-[#C41E3A]/10 text-[#C41E3A] border-[#C41E3A]" : "bg-white text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5"}`}
+                                                        title="Listen"
+                                                    >
+                                                        <Volume2 className={`w-3.5 h-3.5 ${isPlaying === msg.id ? "animate-pulse" : ""}`} />
+                                                    </Button>
                                                 </div>
                                             )}
                                         </div>
@@ -274,6 +307,7 @@ export function ChatInterface({
                                                             <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-tighter mb-0.5">Better Way</span>
                                                             <span className="text-lg font-bold text-[#2C2C2C] leading-tight">{c.correction}</span>
                                                             <span className="text-xs text-[#C41E3A] font-semibold tracking-wide">{c.correctionPinyin}</span>
+                                                            <span className="text-xs text-gray-400 italic mt-0.5">{c.translation}</span>
                                                         </div>
                                                     </div>
                                                     <p className="text-sm text-[#5C4B3A] leading-relaxed border-t border-[#E8E1D5] pt-2 font-medium bg-white/50 -mx-4 px-4 rounded-b-xl">{c.explanation}</p>
