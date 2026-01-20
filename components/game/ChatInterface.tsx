@@ -24,6 +24,7 @@ interface ChatInterfaceProps {
     initialScore?: number | null;
     initialFeedback?: string | null;
     initialCorrections?: any;
+    initialSuggestedFlashcards?: any;
     scenario: {
         id: string;
         title: string;
@@ -45,6 +46,7 @@ export function ChatInterface({
     initialScore,
     initialFeedback,
     initialCorrections,
+    initialSuggestedFlashcards,
     scenario
 }: ChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -54,6 +56,7 @@ export function ChatInterface({
     const [score, setScore] = useState<number | null>(initialScore || null);
     const [feedback, setFeedback] = useState<string | null>(initialFeedback || null);
     const [corrections, setCorrections] = useState<any[]>(initialCorrections || []);
+    const [suggestedFlashcards, setSuggestedFlashcards] = useState<any[]>(initialSuggestedFlashcards || []);
     const [visibleTranslations, setVisibleTranslations] = useState<Set<string>>(new Set());
     const [isPlaying, setIsPlaying] = useState<string | null>(null);
     const [showCheatSheet, setShowCheatSheet] = useState(false);
@@ -118,6 +121,7 @@ export function ChatInterface({
             if (result.score !== null) setScore(result.score);
             if (result.feedback !== null) setFeedback(result.feedback);
             if (result.corrections) setCorrections(result.corrections);
+            if (result.suggestedFlashcards) setSuggestedFlashcards(result.suggestedFlashcards);
         } catch (error) {
             console.error("Failed to send message", error);
         } finally {
@@ -181,6 +185,7 @@ export function ChatInterface({
                             score={score}
                             feedback={feedback}
                             corrections={corrections}
+                            suggestedFlashcards={suggestedFlashcards}
                             conversationId={conversationId}
                             scenarioId={scenario.id}
                             onPlayAudio={playText}

@@ -57,6 +57,7 @@ export default async function PlayPage({ params }: { params: { scenarioId: strin
             initialScore={fullConversation.score}
             initialFeedback={fullConversation.feedback}
             initialCorrections={fullConversation.corrections}
+            initialSuggestedFlashcards={fullConversation.suggestedFlashcards}
             scenario={{
                 id: fullConversation.scenario.id,
                 title: fullConversation.scenario.title,

@@ -102,6 +102,7 @@ export async function submitMessage(conversationId: string, content: string) {
     let feedback = null;
     let score = null;
     let corrections = null;
+    let suggestedFlashcards: { hanzi: string; pinyin: string; meaning: string; explanation: string }[] = [];
 
     if (aiResponse.status !== "ACTIVE") {
         // Conversation just ended, get coach feedback
@@ -124,12 +125,14 @@ export async function submitMessage(conversationId: string, content: string) {
                 status: aiResponse.status,
                 feedback: coachReport.feedback,
                 score: coachReport.score,
-                corrections: enrichedCorrections as any
+                corrections: enrichedCorrections as any,
+                suggestedFlashcards: coachReport.suggestedFlashcards as any
             }
         });
         feedback = coachReport.feedback;
         score = coachReport.score;
         corrections = enrichedCorrections;
+        suggestedFlashcards = coachReport.suggestedFlashcards;
     }
 
     revalidatePath(`/play/${scenario.id}`);
@@ -139,7 +142,8 @@ export async function submitMessage(conversationId: string, content: string) {
         status: finalStatus,
         feedback,
         score,
-        corrections
+        corrections,
+        suggestedFlashcards
     };
 }
 

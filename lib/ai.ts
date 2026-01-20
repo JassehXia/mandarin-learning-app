@@ -77,7 +77,12 @@ export async function generateFeedback(
     history: ChatMessage[],
     scenarioTitle: string,
     objective: string
-): Promise<{ score: number; feedback: string; corrections: { original: string; correction: string; pinyin: string; translation: string; explanation: string }[] }> {
+): Promise<{
+    score: number;
+    feedback: string;
+    corrections: { original: string; correction: string; pinyin: string; translation: string; explanation: string }[];
+    suggestedFlashcards: { hanzi: string; pinyin: string; meaning: string; explanation: string }[];
+}> {
     const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
@@ -98,6 +103,9 @@ Please evaluate the User's performance based on:
 IMPORTANT: Find any specific Mandarin phrases the user got wrong or could say more naturally.
 Include them in the "corrections" array.
 
+Also, suggest 3-5 high-value vocabulary words or short phrases from this conversation that the user should learn/review as flashcards.
+Include them in the "suggestedFlashcards" array.
+
 You must return your response in a strict JSON format:
 {
   "score": (a number from 0 to 100),
@@ -109,6 +117,14 @@ You must return your response in a strict JSON format:
       "pinyin": "Pinyin for the correction",
       "translation": "English translation for the correction",
       "explanation": "Briefly why this is better (in English)"
+    }
+  ],
+  "suggestedFlashcards": [
+    {
+      "hanzi": "Mandarin characters",
+      "pinyin": "Pinyin with tones",
+      "meaning": "English meaning",
+      "explanation": "Context or usage note"
     }
   ]
 }
@@ -124,7 +140,8 @@ You must return your response in a strict JSON format:
     return {
         score: result.score || 0,
         feedback: result.feedback || "Great attempt! Keep practicing.",
-        corrections: result.corrections || []
+        corrections: result.corrections || [],
+        suggestedFlashcards: result.suggestedFlashcards || []
     };
 }
 
