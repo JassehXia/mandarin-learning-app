@@ -53,3 +53,18 @@ export async function getUserFlashcards() {
 
     return flashcards;
 }
+
+export async function deleteFlashcard(id: string) {
+    const user = await getOrCreateUser();
+    if (!user) throw new Error("Unauthorized");
+
+    await db.flashcard.delete({
+        where: {
+            id,
+            userId: user.id
+        }
+    });
+
+    revalidatePath("/flashcards");
+    revalidatePath("/review");
+}

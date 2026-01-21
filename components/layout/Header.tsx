@@ -15,7 +15,7 @@ export function Header() {
 
                 <nav className="flex items-center gap-6">
                     <Link href="/stages" className="text-sm font-medium text-[#5C4B3A] hover:text-[#C41E3A] transition-colors">
-                        Stages
+                        Your Journey
                     </Link>
 
                     <div className="h-4 w-px bg-[#E8E1D5]"></div>

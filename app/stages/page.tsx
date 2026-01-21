@@ -47,10 +47,10 @@ export default async function StagesPage() {
                     </p>
 
                     {user && (
-                        <Link href="/review">
+                        <Link href="/flashcards">
                             <Button className="bg-[#D4AF37] hover:bg-[#B89830] text-white font-bold h-14 px-10 rounded-2xl shadow-xl border-b-4 border-[#A6892C] transition-all transform hover:-translate-y-1 active:translate-y-0 group">
                                 <Sparkles className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
-                                Review Mastery
+                                Flashcards
                             </Button>
                         </Link>
                     )}
