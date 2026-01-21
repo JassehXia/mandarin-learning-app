@@ -131,10 +131,10 @@ export function ReviewQuiz({ initialFlashcards }: ReviewQuizProps) {
                         Review Again
                     </Button>
                     <Button
-                        onClick={() => window.location.href = '/stages'}
+                        onClick={() => window.location.href = '/flashcards'}
                         className="bg-[#C41E3A] hover:bg-[#A01830] text-white font-bold h-12 px-8 rounded-xl shadow-lg border-b-4 border-[#8A1529]"
                     >
-                        Back to Stages
+                        Back to Flashcards
                     </Button>
                 </div>
             </div>
