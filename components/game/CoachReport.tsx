@@ -103,7 +103,14 @@ export function CoachReport({
 
                                         <div className="flex justify-between items-start group/corr-better">
                                             <div className="flex flex-col">
-                                                <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-tighter mb-0.5">Better Way</span>
+                                                <div className="flex items-center gap-2 mb-0.5">
+                                                    <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-tighter">Better Way</span>
+                                                    {c.category && (
+                                                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-[#F5F1EA] text-[#8C7A66] border border-[#E8E1D5] uppercase tracking-wider">
+                                                            {c.category}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <span className="text-lg font-bold text-[#2C2C2C] leading-tight">{c.correction}</span>
                                                 <span className="text-xs text-[#C41E3A] font-semibold tracking-wide">{c.correctionPinyin}</span>
                                                 <span className="text-xs text-gray-400 italic mt-0.5">{c.translation}</span>

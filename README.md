@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏮 Chat with Locals: Learn Mandarin by Living It
 
-## Getting Started
+**Chat with Locals** is an immersive Mandarin learning application designed to bridge the gap between textbook study and real-world conversation. Navigate through authentic life scenarios in China—from ordering street food in Shanghai to checking into a boutique hotel—all powered by intelligent AI roleplay.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🎭 AI-Powered Roleplay
+Engage in dynamic, context-aware conversations with local characters. Our AI doesn't just talk; it acts. Every character has a unique persona, from a trendy boba tea clerk to a helpful elderly local in a park.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 📊 Precision Coaching & Mistake Analysis
+After every session, receive a comprehensive breakdown of your performance:
+- **Categorized Mistakes**: Immediate feedback on **Grammar**, **Word Choice**, **Spelling**, and more.
+- **Natural Corrections**: See exactly how a native speaker would express your thoughts.
+- **Mastery Scoring**: Track your proficiency across different real-world objectives.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🗺️ Immersive Learning Paths
+Progress through curated stages including "A Day in the Life," "Campus Life," and special cultural events like "Chinese New Year."
 
-## Learn More
+### 🃏 Self-Generating Flashcards
+The AI identifies high-value vocabulary from your actual conversations and suggests them as personalized flashcards for later review.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
+- **Authentication**: [Clerk](https://clerk.com/)
+- **Database**: [Prisma](https://www.prisma.io/) with PostgreSQL
+- **AI Core**: [OpenAI GPT-4o-mini](https://openai.com/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
+- **Language Utilities**: [pinyin-pro](https://github.com/zh-94/pinyin-pro)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Getting Started
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Prerequisites
+
+- Node.js 18+
+- A PostgreSQL database
+- OpenAI API Key
+- Clerk API Keys
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/mandarin-learning-app.git
+   cd mandarin-learning-app
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup:**
+   Create a `.env` file in the root and add your keys:
+   ```env
+   DATABASE_URL="your_postgresql_url"
+   OPENAI_API_KEY="your_openai_key"
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your_clerk_pub_key"
+   CLERK_SECRET_KEY="your_clerk_secret_key"
+   ```
+
+4. **Initialize Database:**
+   ```bash
+   npx prisma generate
+   npm run build  # This triggers the seed script in this project
+   ```
+
+5. **Start Development Server:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.

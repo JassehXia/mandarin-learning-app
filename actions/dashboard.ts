@@ -45,14 +45,36 @@ export async function getDashboardStats() {
             },
             score: { not: null }
         },
-        select: { score: true }
+        select: { score: true, corrections: true }
     });
 
     const avgScore = conversationsToday.length > 0
         ? Math.round(conversationsToday.reduce((acc, c) => acc + (c.score || 0), 0) / conversationsToday.length)
         : 0;
 
-    // 4. Recent activity (last 5 interactions)
+    // 4. Mistake Categorization (Aggragated from today's corrections)
+    const mistakeCounts: Record<string, number> = {
+        "Grammar": 0,
+        "Word Choice": 0,
+        "Spelling": 0,
+        "Other": 0
+    };
+
+    conversationsToday.forEach(c => {
+        const corrections = (c as any).corrections as any[] | null;
+        if (corrections && Array.isArray(corrections)) {
+            corrections.forEach(corr => {
+                const cat = corr.category || "Other";
+                if (mistakeCounts[cat] !== undefined) {
+                    mistakeCounts[cat]++;
+                } else {
+                    mistakeCounts["Other"]++;
+                }
+            });
+        }
+    });
+
+    // 5. Recent activity (last 5 interactions)
     const recentActivity = await db.conversation.findMany({
         where: { userId: user.id },
         include: { scenario: true },
@@ -69,7 +91,8 @@ export async function getDashboardStats() {
             completed: completedToday,
             flashcards: flashcardsToday,
             avgScore: avgScore,
-            goalPercent: Math.min(Math.round((completedToday / 3) * 100), 100) // Default goal: 3 scenarios
+            goalPercent: Math.min(Math.round((completedToday / 3) * 100), 100),
+            mistakes: mistakeCounts
         },
         total: {
             flashcards: totalFlashcards,

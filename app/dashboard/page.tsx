@@ -1,6 +1,7 @@
 import { getDashboardStats } from "@/actions/dashboard";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { ActivityList } from "@/components/dashboard/ActivityList";
+import { MistakeAnalysis } from "@/components/dashboard/MistakeAnalysis";
 import { DailyProgress } from "@/components/game/DailyProgress";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -48,7 +49,7 @@ export default async function DashboardPage() {
                 </div>
 
                 {/* Focus: Today's Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-stretch">
                     <StatsCard
                         title="Today's Mastery"
                         value={stats.daily.completed}
@@ -72,39 +73,20 @@ export default async function DashboardPage() {
                     />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    {/* Left Column: Progress & Quick Actions */}
-                    <div className="lg:col-span-1 space-y-8">
-                        {/* Daily Goal Progress */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                    {/* 1. Daily Goal */}
+                    <div className="lg:col-span-1">
                         <DailyProgress goalPercent={stats.daily.goalPercent} />
-
-                        {/* Lifetime Context */}
-                        <div className="bg-[#2D241E] rounded-3xl p-8 text-white shadow-xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                                <BookOpen className="w-24 h-24" />
-                            </div>
-                            <h3 className="text-xl font-serif font-bold mb-6 relative z-10">Your Legacy</h3>
-                            <div className="space-y-4 relative z-10">
-                                <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                                    <span className="text-white/60 text-sm font-medium">Scenarios Mastered</span>
-                                    <span className="text-xl font-black text-[#D4AF37]">{stats.total.completed}</span>
-                                </div>
-                                <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                                    <span className="text-white/60 text-sm font-medium">Flashcards Collected</span>
-                                    <span className="text-xl font-black text-[#D4AF37]">{stats.total.flashcards}</span>
-                                </div>
-                            </div>
-                            <Link href="/flashcards" className="mt-8 block">
-                                <Button className="w-full bg-[#D4AF37] hover:bg-[#B89830] text-white font-bold h-12 rounded-xl border-b-4 border-[#A6892C]">
-                                    Review All Cards
-                                </Button>
-                            </Link>
-                        </div>
                     </div>
 
-                    {/* Right Column: Recent Activity */}
-                    <div className="lg:col-span-2">
+                    {/* 2. Recent Activity */}
+                    <div className="lg:col-span-1">
                         <ActivityList activities={stats.recentActivity} />
+                    </div>
+
+                    {/* 3. Mistake Analysis */}
+                    <div className="lg:col-span-1">
+                        <MistakeAnalysis mistakes={stats.daily.mistakes} />
                     </div>
                 </div>
             </div>
