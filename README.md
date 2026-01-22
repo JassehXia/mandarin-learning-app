@@ -30,7 +30,7 @@ The AI identifies high-value vocabulary from your actual conversations and sugge
 - **Database**: [Prisma](https://www.prisma.io/) with PostgreSQL
 - **AI Core**: [OpenAI GPT-4o-mini](https://openai.com/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
-- **Language Utilities**: [pinyin-pro](https://github.com/zh-94/pinyin-pro)
+- **Language Utilities**: [pinyin-pro](https://www.npmjs.com/package/pinyin-pro)
 
 ---
 

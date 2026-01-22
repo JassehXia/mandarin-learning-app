@@ -89,6 +89,11 @@ async function main() {
             characterId: c.auntie.id,
             pathwayId: p.life.id,
             x: 50, y: 15,
+            keyPhrases: [
+                { phrase: "煎饼", pinyin: "jiānbǐng", translation: "savory pancake" },
+                { phrase: "香菜", pinyin: "xiāngcài", translation: "cilantro" },
+                { phrase: "加辣", pinyin: "jiā là", translation: "add chili/spicy" }
+            ]
         }
     });
 
@@ -116,6 +121,11 @@ async function main() {
             characterId: c.zhang.id,
             pathwayId: p.life.id,
             x: 50, y: 75,
+            keyPhrases: [
+                { phrase: "目的地", pinyin: "mùdìdì", translation: "destination" },
+                { phrase: "堵车", pinyin: "dǔchē", translation: "traffic jam" },
+                { phrase: "师傅", pinyin: "shīfu", translation: "master/driver (polite)" }
+            ],
             prerequisites: { connect: [{ id: breakfast.id }] }
         }
     });
@@ -130,6 +140,12 @@ async function main() {
             characterId: c.zhang.id,
             pathwayId: p.life.id,
             x: 80, y: 105,
+            keyPhrases: [
+                { phrase: "屏幕", pinyin: "píngmù", translation: "screen" },
+                { phrase: "坏了", pinyin: "huài le", translation: "broken" },
+                { phrase: "修理", pinyin: "xiūlǐ", translation: "to repair" },
+                { phrase: "多久", pinyin: "duōjiǔ", translation: "how long" }
+            ],
             prerequisites: { connect: [{ id: commute.id }] }
         }
     });
@@ -144,6 +160,11 @@ async function main() {
             characterId: c.mei.id,
             pathwayId: p.life.id,
             x: 20, y: 135,
+            keyPhrases: [
+                { phrase: "冰拿铁", pinyin: "bīng nátuǐ", translation: "iced latte" },
+                { phrase: "燕麦奶", pinyin: "yànmàinǎi", translation: "oat milk" },
+                { phrase: "打包", pinyin: "dǎbāo", translation: "to go / take out" }
+            ],
             prerequisites: { connect: [{ id: commute.id }] }
         }
     });

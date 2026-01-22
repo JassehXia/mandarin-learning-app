@@ -41,6 +41,7 @@ Return JSON:
         model: 'gpt-4o-mini',
         messages: messages,
         temperature: 0.8,
+        max_tokens: 300,
         response_format: { type: "json_object" },
     });
 
@@ -96,6 +97,7 @@ Return JSON:
         ],
         response_format: { type: "json_object" },
         temperature: 0.7,
+        max_tokens: 800,
     });
 
     const result = JSON.parse(response.choices[0]?.message?.content || '{}');
@@ -126,6 +128,7 @@ export async function getHanziFromPinyin(pinyin: string): Promise<string> {
                 }
             ],
             temperature: 0.3, // Lower temperature for more deterministic conversion
+            max_tokens: 100,
         });
 
         return response.choices[0]?.message?.content?.trim() || pinyin;
