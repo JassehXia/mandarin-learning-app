@@ -145,4 +145,32 @@ You must return your response in a strict JSON format:
     };
 }
 
+/**
+ * Converts a pinyin string into the most likely Chinese characters (Hanzi).
+ * Useful for providing natural-sounding audio feedback for user inputs.
+ */
+export async function getHanziFromPinyin(pinyin: string): Promise<string> {
+    try {
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are a pinyin-to-hanzi converter. Convert the provided pinyin into the most statistically likely Chinese characters (Simplified). Return ONLY the Hanzi characters, no other text or explanation.'
+                },
+                {
+                    role: 'user',
+                    content: pinyin
+                }
+            ],
+            temperature: 0.3, // Lower temperature for more deterministic conversion
+        });
+
+        return response.choices[0]?.message?.content?.trim() || pinyin;
+    } catch (error) {
+        console.error("AI Pinyin to Hanzi conversion failed:", error);
+        return pinyin;
+    }
+}
+
 

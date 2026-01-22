@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma as db } from "@/lib/prisma"; // Use the singleton
-import { chatWithCharacter, generateFeedback } from "@/lib/ai";
+import { chatWithCharacter, generateFeedback, getHanziFromPinyin } from "@/lib/ai";
 import { revalidatePath } from "next/cache";
 import { getOrCreateUser } from "@/lib/auth-util";
 import { pinyin } from "pinyin-pro";
@@ -193,5 +193,9 @@ export async function deleteConversation(conversationId: string) {
         await db.conversation.delete({ where: { id: conversationId } });
     }
     revalidatePath("/");
+}
+
+export async function convertPinyinToHanzi(pinyin: string): Promise<string> {
+    return await getHanziFromPinyin(pinyin);
 }
 

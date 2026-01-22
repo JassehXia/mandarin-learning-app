@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Input } from "../ui/input";
-import { Volume2, CheckCircle2, XCircle, ArrowRight, Home, RefreshCw, Eye, EyeOff } from "lucide-react";
+import { CheckCircle2, XCircle, ArrowRight, Home, RefreshCw, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { comparePinyin } from "@/lib/pinyin-compare";
 import { convertToToneMarks } from "@/lib/pinyin-input-util";
 import { cn } from "@/lib/utils";
+import { AudioButton } from "@/components/ui/AudioButton";
 
 interface Flashcard {
     id: string;
@@ -30,8 +31,6 @@ export function LearningMode({ initialFlashcards }: LearningModeProps) {
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [differences, setDifferences] = useState<Array<{ char: string; isCorrect: boolean; position: number }>>([]);
     const [isFinished, setIsFinished] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isPlayingInput, setIsPlayingInput] = useState(false);
     const [showHint, setShowHint] = useState(false);
     const [isToneMode, setIsToneMode] = useState(true);
 
@@ -44,19 +43,6 @@ export function LearningMode({ initialFlashcards }: LearningModeProps) {
         }
     }, [initialFlashcards]);
 
-    const playAudio = useCallback((text: string) => {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        setIsPlaying(true);
-        const utterance = new SpeechSynthesisUtterance(text);
-        const voices = window.speechSynthesis.getVoices();
-        const zhVoice = voices.find(v => v.lang.includes('zh-CN')) || voices.find(v => v.lang.includes('zh'));
-        if (zhVoice) utterance.voice = zhVoice;
-        utterance.onend = () => setIsPlaying(false);
-        utterance.onerror = () => setIsPlaying(false);
-        window.speechSynthesis.speak(utterance);
-    }, []);
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value;
         if (isToneMode) {
@@ -65,16 +51,14 @@ export function LearningMode({ initialFlashcards }: LearningModeProps) {
         setUserInput(val);
     };
 
-    const playInputAudio = () => {
-        if (!userInput.trim() || !window.speechSynthesis) return;
+    // Simple helper to play audio for correct answers
+    const playAudio = (text: string) => {
+        if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
-        setIsPlayingInput(true);
-        const utterance = new SpeechSynthesisUtterance(userInput);
+        const utterance = new SpeechSynthesisUtterance(text);
         const voices = window.speechSynthesis.getVoices();
         const zhVoice = voices.find(v => v.lang.includes('zh-CN')) || voices.find(v => v.lang.includes('zh'));
         if (zhVoice) utterance.voice = zhVoice;
-        utterance.onend = () => setIsPlayingInput(false);
-        utterance.onerror = () => setIsPlayingInput(false);
         window.speechSynthesis.speak(utterance);
     };
 
@@ -197,14 +181,10 @@ export function LearningMode({ initialFlashcards }: LearningModeProps) {
                                 {currentCard.hanzi}
                             </h3>
 
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                onClick={() => playAudio(currentCard.hanzi)}
-                                className={`rounded-full h-14 w-14 border-2 transition-all mx-auto flex items-center justify-center mb-6 ${isPlaying ? "bg-[#C41E3A]/10 border-[#C41E3A] text-[#C41E3A]" : "border-[#E8E1D5] text-[#8A7E72] hover:border-[#C41E3A] hover:text-[#C41E3A]"}`}
-                            >
-                                <Volume2 className={`w-6 h-6 shrink-0 ${isPlaying ? "animate-pulse" : ""}`} />
-                            </Button>
+                            <AudioButton
+                                text={currentCard.hanzi}
+                                className="rounded-full h-14 w-14 border-2 mx-auto mb-6 border-[#E8E1D5] text-[#8A7E72] hover:border-[#C41E3A] hover:text-[#C41E3A]"
+                            />
 
                             {/* Hint Button */}
                             <Button
@@ -242,20 +222,14 @@ export function LearningMode({ initialFlashcards }: LearningModeProps) {
                                     disabled={isSubmitted}
                                 />
                                 {!isSubmitted && (
-                                    <button
-                                        type="button"
-                                        onClick={playInputAudio}
+                                    <AudioButton
+                                        text={userInput}
+                                        isPinyin={true}
+                                        size="sm"
+                                        variant="ghost"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2"
                                         disabled={!userInput.trim()}
-                                        className={cn(
-                                            "absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all disabled:opacity-30",
-                                            isPlayingInput
-                                                ? "bg-[#D4AF37]/20 text-[#D4AF37]"
-                                                : "bg-gray-100 text-gray-600 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37]"
-                                        )}
-                                        title="Listen to your text"
-                                    >
-                                        <Volume2 className={cn("w-5 h-5", isPlayingInput && "animate-pulse")} />
-                                    </button>
+                                    />
                                 )}
                             </div>
 

@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Sparkles, Keyboard, Info, Volume2 } from "lucide-react";
+import { Send, Keyboard, Info } from "lucide-react";
 import { convertToToneMarks } from "@/lib/pinyin-input-util";
 import { cn } from "@/lib/utils";
+import { AudioButton } from "@/components/ui/AudioButton";
 
 interface ChatInputProps {
     input: string;
@@ -23,7 +24,6 @@ export function ChatInput({
     isLoading
 }: ChatInputProps) {
     const [isToneMode, setIsToneMode] = useState(true);
-    const [isPlaying, setIsPlaying] = useState(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value;
@@ -31,19 +31,6 @@ export function ChatInput({
             val = convertToToneMarks(val);
         }
         setInput(val);
-    };
-
-    const playAudio = () => {
-        if (!input.trim() || !window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        setIsPlaying(true);
-        const utterance = new SpeechSynthesisUtterance(input);
-        const voices = window.speechSynthesis.getVoices();
-        const zhVoice = voices.find(v => v.lang.includes('zh-CN')) || voices.find(v => v.lang.includes('zh'));
-        if (zhVoice) utterance.voice = zhVoice;
-        utterance.onend = () => setIsPlaying(false);
-        utterance.onerror = () => setIsPlaying(false);
-        window.speechSynthesis.speak(utterance);
     };
 
     return (
@@ -55,25 +42,19 @@ export function ChatInput({
                             value={input}
                             onChange={handleInputChange}
                             placeholder="Type your response..."
-                            className="w-full border-[#E8E1D5] bg-[#FDFBF7] text-lg h-12 pr-20 focus-visible:ring-[#C41E3A] rounded-2xl shadow-sm transition-all"
+                            className="w-full border-[#E8E1D5] bg-[#FDFBF7] text-lg h-12 pr-28 focus-visible:ring-[#C41E3A] rounded-2xl shadow-sm transition-all"
                             autoFocus
                             disabled={disabled}
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
-                            <button
-                                type="button"
-                                onClick={playAudio}
+                            <AudioButton
+                                text={input}
+                                isPinyin={true}
+                                size="sm"
+                                variant="ghost"
                                 disabled={!input.trim() || disabled}
-                                className={cn(
-                                    "p-1.5 rounded-lg transition-all disabled:opacity-30",
-                                    isPlaying
-                                        ? "bg-[#D4AF37]/20 text-[#D4AF37]"
-                                        : "bg-gray-100 text-gray-600 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37]"
-                                )}
-                                title="Listen to your text"
-                            >
-                                <Volume2 className={cn("w-4 h-4", isPlaying && "animate-pulse")} />
-                            </button>
+                                label="Listen"
+                            />
                             <button
                                 type="button"
                                 onClick={() => setIsToneMode(!isToneMode)}
