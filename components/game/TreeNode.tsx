@@ -20,8 +20,7 @@ export function TreeNode({ scenario, status }: TreeNodeProps) {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             whileHover={{ scale: 1.05, y: -5 }}
-            className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
-            style={{ left: `${scenario.x}%`, top: `${scenario.y * 10}px` }} // Using y as a multiplier for vertical spacing
+            className="z-10"
         >
             <div className="relative group">
                 {/* Node Circle */}

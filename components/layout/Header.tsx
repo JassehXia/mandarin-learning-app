@@ -18,6 +18,9 @@ export function Header() {
                         <Link href="/dashboard" className="text-sm font-medium text-[#5C4B3A] hover:text-[#C41E3A] transition-colors">
                             Dashboard
                         </Link>
+                        <Link href="/flashcards" className="text-sm font-medium text-[#5C4B3A] hover:text-[#C41E3A] transition-colors">
+                            Flashcards
+                        </Link>
                     </SignedIn>
 
                     <Link href="/stages" className="text-sm font-medium text-[#5C4B3A] hover:text-[#C41E3A] transition-colors">

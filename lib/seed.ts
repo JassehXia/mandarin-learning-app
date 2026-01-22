@@ -88,7 +88,21 @@ async function main() {
             location: "Street Corner",
             characterId: c.auntie.id,
             pathwayId: p.life.id,
-            x: 50, y: 5,
+            x: 50, y: 15,
+        }
+    });
+
+    const exercise = await prisma.scenario.create({
+        data: {
+            title: "Park Exercise",
+            description: "Join locals for morning exercises.",
+            objective: "Ask if you can join and what the movements are called.",
+            difficulty: "Beginner",
+            location: "Public Park",
+            characterId: c.chen.id,
+            pathwayId: p.life.id,
+            x: 20, y: 45,
+            prerequisites: { connect: [{ id: breakfast.id }] }
         }
     });
 
@@ -101,8 +115,22 @@ async function main() {
             location: "Sidewalk",
             characterId: c.zhang.id,
             pathwayId: p.life.id,
-            x: 50, y: 25,
+            x: 50, y: 75,
             prerequisites: { connect: [{ id: breakfast.id }] }
+        }
+    });
+
+    const repair = await prisma.scenario.create({
+        data: {
+            title: "Phone Repair",
+            description: "Your screen is cracked.",
+            objective: "Ask how much it costs to fix and how long.",
+            difficulty: "Advanced",
+            location: "Repair Stall",
+            characterId: c.zhang.id,
+            pathwayId: p.life.id,
+            x: 80, y: 105,
+            prerequisites: { connect: [{ id: commute.id }] }
         }
     });
 
@@ -115,8 +143,92 @@ async function main() {
             location: "Cafe",
             characterId: c.mei.id,
             pathwayId: p.life.id,
-            x: 30, y: 50,
+            x: 20, y: 135,
             prerequisites: { connect: [{ id: commute.id }] }
+        }
+    });
+
+    const postOffice = await prisma.scenario.create({
+        data: {
+            title: "Sending a Package",
+            description: "Ship a souvenir back home.",
+            objective: "Ask for the price of shipping to your country.",
+            difficulty: "Intermediate",
+            location: "Post Office",
+            characterId: c.manager.id,
+            pathwayId: p.life.id,
+            x: 50, y: 165,
+            prerequisites: { connect: [{ id: commute.id }] }
+        }
+    });
+
+    const bookstore = await prisma.scenario.create({
+        data: {
+            title: "Hidden Gems",
+            description: "Look for a specific book on history.",
+            objective: "Ask the clerk for recommendations on local lore.",
+            difficulty: "Advanced",
+            location: "Bookstore",
+            characterId: c.teacher.id,
+            pathwayId: p.life.id,
+            x: 20, y: 195,
+            prerequisites: { connect: [{ id: exercise.id }] }
+        }
+    });
+
+    const bank = await prisma.scenario.create({
+        data: {
+            title: "Opening an Account",
+            description: "Set up a local bank account.",
+            objective: "Inquire about the necessary documents.",
+            difficulty: "Advanced",
+            location: "Bank",
+            characterId: c.manager.id,
+            pathwayId: p.life.id,
+            x: 80, y: 195,
+            prerequisites: { connect: [{ id: postOffice.id }] }
+        }
+    });
+
+    const pharmacy = await prisma.scenario.create({
+        data: {
+            title: "At the Pharmacy",
+            description: "You have a slight headache.",
+            objective: "Explain your symptoms and ask for medicine.",
+            difficulty: "Intermediate",
+            location: "Pharmacy",
+            characterId: c.li.id,
+            pathwayId: p.life.id,
+            x: 50, y: 225,
+            prerequisites: { connect: [{ id: coffee.id }, { id: postOffice.id }] }
+        }
+    });
+
+    const laundry = await prisma.scenario.create({
+        data: {
+            title: "Dry Cleaning",
+            description: "Drop off your suit for cleaning.",
+            objective: "Ask when it will be ready and for a receipt.",
+            difficulty: "Intermediate",
+            location: "Laundry Shop",
+            characterId: c.li.id,
+            pathwayId: p.life.id,
+            x: 20, y: 255,
+            prerequisites: { connect: [{ id: pharmacy.id }] }
+        }
+    });
+
+    const haircut = await prisma.scenario.create({
+        data: {
+            title: "New Look",
+            description: "Get a haircut in a trendy salon.",
+            objective: "Explain that you want a trim and show a photo.",
+            difficulty: "Intermediate",
+            location: "Hair Salon",
+            characterId: c.mei.id,
+            pathwayId: p.life.id,
+            x: 80, y: 255,
+            prerequisites: { connect: [{ id: pharmacy.id }] }
         }
     });
 
@@ -129,8 +241,36 @@ async function main() {
             location: "Hot Pot Restaurant",
             characterId: c.xiao.id,
             pathwayId: p.life.id,
-            x: 70, y: 50,
-            prerequisites: { connect: [{ id: commute.id }] }
+            x: 50, y: 285,
+            prerequisites: { connect: [{ id: laundry.id }, { id: haircut.id }] }
+        }
+    });
+
+    const karaoke = await prisma.scenario.create({
+        data: {
+            title: "KTV Night",
+            description: "Go to karaoke with friends.",
+            objective: "Suggest some songs to sing and order snacks.",
+            difficulty: "Advanced",
+            location: "KTV Room",
+            characterId: c.xiao.id,
+            pathwayId: p.life.id,
+            x: 20, y: 315,
+            prerequisites: { connect: [{ id: dinner.id }] }
+        }
+    });
+
+    const nightWalk = await prisma.scenario.create({
+        data: {
+            title: "Bund Stroll",
+            description: "Take a walk along the river.",
+            objective: "Comment on the beautiful skyline views.",
+            difficulty: "Advanced",
+            location: "The Bund",
+            characterId: c.chen.id,
+            pathwayId: p.life.id,
+            x: 80, y: 315,
+            prerequisites: { connect: [{ id: dinner.id }] }
         }
     });
 
@@ -143,8 +283,8 @@ async function main() {
             location: "Local Market",
             characterId: c.lao.id,
             pathwayId: p.life.id,
-            x: 50, y: 80,
-            prerequisites: { connect: [{ id: coffee.id }, { id: dinner.id }] }
+            x: 50, y: 345,
+            prerequisites: { connect: [{ id: karaoke.id }, { id: nightWalk.id }] }
         }
     });
 
@@ -158,7 +298,21 @@ async function main() {
             location: "Admin Building",
             characterId: c.manager.id,
             pathwayId: p.school.id,
-            x: 50, y: 10,
+            x: 50, y: 15,
+        }
+    });
+
+    const dorm = await prisma.scenario.create({
+        data: {
+            title: "Dorm Check-in",
+            description: "Get your room keys and meeting rules.",
+            objective: "Ask about the laundry and curfew times.",
+            difficulty: "Beginner",
+            location: "Dormitory",
+            characterId: c.manager.id,
+            pathwayId: p.school.id,
+            x: 80, y: 45,
+            prerequisites: { connect: [{ id: registration.id }] }
         }
     });
 
@@ -171,8 +325,22 @@ async function main() {
             location: "Campus Hallway",
             characterId: c.student.id,
             pathwayId: p.school.id,
-            x: 50, y: 35,
+            x: 50, y: 75,
             prerequisites: { connect: [{ id: registration.id }] }
+        }
+    });
+
+    const cafeteria = await prisma.scenario.create({
+        data: {
+            title: "Canteen Lunch",
+            description: "Navigate the busy student cafeteria.",
+            objective: "Order a local specialty and find a seat.",
+            difficulty: "Beginner",
+            location: "Canteen",
+            characterId: c.student.id,
+            pathwayId: p.school.id,
+            x: 20, y: 110,
+            prerequisites: { connect: [{ id: classFinding.id }] }
         }
     });
 
@@ -185,8 +353,36 @@ async function main() {
             location: "University Library",
             characterId: c.manager.id,
             pathwayId: p.school.id,
-            x: 80, y: 65,
+            x: 80, y: 110,
             prerequisites: { connect: [{ id: classFinding.id }] }
+        }
+    });
+
+    const printing = await prisma.scenario.create({
+        data: {
+            title: "Printing Shop",
+            description: "Print your essay for tomorrow.",
+            objective: "Ask for double-sided printing and staples.",
+            difficulty: "Intermediate",
+            location: "Campus Shop",
+            characterId: c.li.id,
+            pathwayId: p.school.id,
+            x: 50, y: 145,
+            prerequisites: { connect: [{ id: cafeteria.id }, { id: library.id }] }
+        }
+    });
+
+    const lab = await prisma.scenario.create({
+        data: {
+            title: "Lab Safety",
+            description: "First day in the chemistry lab.",
+            objective: "Ask the professor about safety protocols.",
+            difficulty: "Advanced",
+            location: "Science Lab",
+            characterId: c.teacher.id,
+            pathwayId: p.school.id,
+            x: 20, y: 180,
+            prerequisites: { connect: [{ id: printing.id }] }
         }
     });
 
@@ -197,10 +393,108 @@ async function main() {
             objective: "Ask about the meeting times and requirements.",
             difficulty: "Intermediate",
             location: "Gymnasium",
-            characterId: c.teacher.id, // Professor/Teacher type
+            characterId: c.teacher.id,
             pathwayId: p.school.id,
-            x: 20, y: 65,
-            prerequisites: { connect: [{ id: classFinding.id }] }
+            x: 80, y: 180,
+            prerequisites: { connect: [{ id: printing.id }] }
+        }
+    });
+
+    const peerReview = await prisma.scenario.create({
+        data: {
+            title: "Peer Review",
+            description: "Exchange drafts with a classmate.",
+            objective: "Give constructive feedback on their essay.",
+            difficulty: "Advanced",
+            location: "Classroom",
+            characterId: c.student.id,
+            pathwayId: p.school.id,
+            x: 50, y: 215,
+            prerequisites: { connect: [{ id: lab.id }, { id: club.id }] }
+        }
+    });
+
+    const exchange = await prisma.scenario.create({
+        data: {
+            title: "Language Exchange",
+            description: "Meet a local for language practice.",
+            objective: "Suggest topics and coordinate future meetings.",
+            difficulty: "Advanced",
+            location: "Campus Cafe",
+            characterId: c.student.id,
+            pathwayId: p.school.id,
+            x: 20, y: 250,
+            prerequisites: { connect: [{ id: peerReview.id }] }
+        }
+    });
+
+    const sports = await prisma.scenario.create({
+        data: {
+            title: "Sports Meet",
+            description: "Participate in the campus games.",
+            objective: "Cheer for your team and ask for the score.",
+            difficulty: "Intermediate",
+            location: "Track Field",
+            characterId: c.student.id,
+            pathwayId: p.school.id,
+            x: 80, y: 250,
+            prerequisites: { connect: [{ id: peerReview.id }] }
+        }
+    });
+
+    const tour = await prisma.scenario.create({
+        data: {
+            title: "Campus History",
+            description: "Listen to a talk on the old gate.",
+            objective: "Ask a question about the university's origins.",
+            difficulty: "Advanced",
+            location: "Main Gate",
+            characterId: c.chen.id,
+            pathwayId: p.school.id,
+            x: 50, y: 285,
+            prerequisites: { connect: [{ id: exchange.id }, { id: sports.id }] }
+        }
+    });
+
+    const itSupport = await prisma.scenario.create({
+        data: {
+            title: "IT Support",
+            description: "WiFi is not working in the dorm.",
+            objective: "Describe the issue and ask for a fix.",
+            difficulty: "Intermediate",
+            location: "IT Office",
+            characterId: c.manager.id,
+            pathwayId: p.school.id,
+            x: 80, y: 315,
+            prerequisites: { connect: [{ id: tour.id }] }
+        }
+    });
+
+    const graduation = await prisma.scenario.create({
+        data: {
+            title: "Graduation Prep",
+            description: "Pick up your cap and gown.",
+            objective: "Check if the size is correct and ask about the ceremony.",
+            difficulty: "Advanced",
+            location: "Auditorium",
+            characterId: c.manager.id,
+            pathwayId: p.school.id,
+            x: 50, y: 345,
+            prerequisites: { connect: [{ id: tour.id }] }
+        }
+    });
+
+    const finalPresentation = await prisma.scenario.create({
+        data: {
+            title: "The Final Defense",
+            description: "Present your thesis to the panel.",
+            objective: "Summarize your findings and answer questions.",
+            difficulty: "Advanced",
+            location: "Meeting Hall",
+            characterId: c.teacher.id,
+            pathwayId: p.school.id,
+            x: 50, y: 385,
+            prerequisites: { connect: [{ id: graduation.id }] }
         }
     });
 
@@ -218,6 +512,20 @@ async function main() {
         }
     });
 
+    const buyingFish = await prisma.scenario.create({
+        data: {
+            title: "Nian Nian You Yu",
+            description: "Buy the symbolic fish for dinner.",
+            objective: "Ask for a fresh perch and express its meaning.",
+            difficulty: "Beginner",
+            location: "Fish Market",
+            characterId: c.auntie.id,
+            pathwayId: p.cny.id,
+            x: 20, y: 50,
+            prerequisites: { connect: [{ id: preparations.id }] }
+        }
+    });
+
     const greetings = await prisma.scenario.create({
         data: {
             title: "红包 (Hóngbāo)",
@@ -227,8 +535,36 @@ async function main() {
             location: "Traditional Courtyard",
             characterId: c.relative.id,
             pathwayId: p.cny.id,
-            x: 50, y: 45,
+            x: 50, y: 85,
             prerequisites: { connect: [{ id: preparations.id }] }
+        }
+    });
+
+    const dumplings = await prisma.scenario.create({
+        data: {
+            title: "Dumpling Joy",
+            description: "Learn to fold dumplings.",
+            objective: "Ask about the filling and show your effort.",
+            difficulty: "Beginner",
+            location: "Kitchen",
+            characterId: c.relative.id,
+            pathwayId: p.cny.id,
+            x: 80, y: 120,
+            prerequisites: { connect: [{ id: greetings.id }] }
+        }
+    });
+
+    const firecrackers = await prisma.scenario.create({
+        data: {
+            title: "Light the Night",
+            description: "Handle firecrackers carefully.",
+            objective: "Ask how to light them safely and duck for cover.",
+            difficulty: "Intermediate",
+            location: "Village Square",
+            characterId: c.xiao.id,
+            pathwayId: p.cny.id,
+            x: 20, y: 120,
+            prerequisites: { connect: [{ id: greetings.id }] }
         }
     });
 
@@ -241,8 +577,106 @@ async function main() {
             location: "Temple Fair",
             characterId: c.auntie.id,
             pathwayId: p.cny.id,
-            x: 50, y: 75,
-            prerequisites: { connect: [{ id: greetings.id }] }
+            x: 50, y: 155,
+            prerequisites: { connect: [{ id: firecrackers.id }] }
+        }
+    });
+
+    const lionDance = await prisma.scenario.create({
+        data: {
+            title: "Lion Dance",
+            description: "Watch the performers in the street.",
+            objective: "Ask about the history of the dance.",
+            difficulty: "Intermediate",
+            location: "Main Street",
+            characterId: c.lao.id,
+            pathwayId: p.cny.id,
+            x: 80, y: 190,
+            prerequisites: { connect: [{ id: templeFair.id }] }
+        }
+    });
+
+    const giftExchange = await prisma.scenario.create({
+        data: {
+            title: "Gift Exchange",
+            description: "Bring fruit baskets to neighbors.",
+            objective: "Politely insist they accept the gift.",
+            difficulty: "Intermediate",
+            location: "Neighbor's Door",
+            characterId: c.relative.id,
+            pathwayId: p.cny.id,
+            x: 50, y: 225,
+            prerequisites: { connect: [{ id: lionDance.id }] }
+        }
+    });
+
+    const teaCeremony = await prisma.scenario.create({
+        data: {
+            title: "Afternoon Tea",
+            description: "Learn the proper way to serve tea.",
+            objective: "Demonstrate respect and ask about tea types.",
+            difficulty: "Advanced",
+            location: "Tea House",
+            characterId: c.chen.id,
+            pathwayId: p.cny.id,
+            x: 20, y: 260,
+            prerequisites: { connect: [{ id: giftExchange.id }] }
+        }
+    });
+
+    const riddles = await prisma.scenario.create({
+        data: {
+            title: "Lantern Riddles",
+            description: "Solve puzzles written on lanterns.",
+            objective: "Try to guess a riddle and ask for a hint.",
+            difficulty: "Advanced",
+            location: "Garden",
+            characterId: c.teacher.id,
+            pathwayId: p.cny.id,
+            x: 80, y: 260,
+            prerequisites: { connect: [{ id: giftExchange.id }] }
+        }
+    });
+
+    const lanternFestival = await prisma.scenario.create({
+        data: {
+            title: "Lantern Glow",
+            description: "The final celebration of the season.",
+            objective: "Discuss the different lantern designs.",
+            difficulty: "Advanced",
+            location: "Riverside",
+            characterId: c.mei.id,
+            pathwayId: p.cny.id,
+            x: 50, y: 295,
+            prerequisites: { connect: [{ id: teaCeremony.id }, { id: riddles.id }] }
+        }
+    });
+
+    const reunionDinner = await prisma.scenario.create({
+        data: {
+            title: "Reunion Feast",
+            description: "The main family dinner.",
+            objective: "Give a small toast to the elder relatives.",
+            difficulty: "Advanced",
+            location: "Dining Room",
+            characterId: c.relative.id,
+            pathwayId: p.cny.id,
+            x: 20, y: 335,
+            prerequisites: { connect: [{ id: lanternFestival.id }] }
+        }
+    });
+
+    const springCouplets = await prisma.scenario.create({
+        data: {
+            title: "Spring Couplets",
+            description: "Write poetry for the front door.",
+            objective: "Choose auspicious characters with Mr. Chen.",
+            difficulty: "Advanced",
+            location: "Study Room",
+            characterId: c.chen.id,
+            pathwayId: p.cny.id,
+            x: 80, y: 335,
+            prerequisites: { connect: [{ id: lanternFestival.id }] }
         }
     });
 

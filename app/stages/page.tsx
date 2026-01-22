@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getOrCreateUser } from "@/lib/auth-util";
+import { getDashboardStats } from "@/actions/dashboard";
 import { PathwayView } from "@/components/game/PathwayView";
+import { DailyProgress } from "@/components/game/DailyProgress";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Sparkles, Compass } from "lucide-react";
@@ -9,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StagesPage() {
     const user = await getOrCreateUser();
+    const stats = await getDashboardStats();
 
     // Fetch all pathways
     const pathways = await prisma.pathway.findMany({
@@ -33,30 +36,23 @@ export default async function StagesPage() {
     const completedScenarioIds = new Set<string>(user?.completedScenarioIds || []);
 
     return (
-        <main className="min-h-screen bg-[#FDFBF7] pt-10 pb-32 overflow-x-hidden">
-            <div className="container mx-auto px-4 max-w-6xl">
-                <div className="mb-16 text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-[#C41E3A]/10 rounded-3xl mb-6 transform rotate-12">
-                        <Compass className="w-8 h-8 text-[#C41E3A] transform -rotate-12" />
+        <main className="h-[calc(100vh-64px)] bg-[#FDFBF7] flex flex-col overflow-hidden">
+            {/* Header / Intro Section - Compact for full-screen view */}
+            <div className="container mx-auto px-4 pt-6 pb-4 flex flex-col items-center">
+                <div className="flex items-center gap-4 mb-2">
+                    <div className="w-10 h-10 bg-[#C41E3A]/10 rounded-2xl flex items-center justify-center transform rotate-12">
+                        <Compass className="w-5 h-5 text-[#C41E3A] transform -rotate-12" />
                     </div>
-                    <h1 className="text-4xl md:text-7xl font-serif font-black text-[#C41E3A] mb-6 tracking-tight">
-                        Choose Your <span className="italic">Path</span>
+                    <h1 className="text-3xl font-serif font-black text-[#C41E3A] tracking-tight">
+                        Your <span className="italic">Journey</span>
                     </h1>
-                    <p className="text-[#5C4B3A] text-xl max-w-2xl mx-auto font-medium mb-10 leading-relaxed">
-                        {user ? `You have mastered ${completedScenarioIds.size} stages. Which story will you tell today?` : "Embark on a journey through Chinese culture and language."}
-                    </p>
-
-                    {user && (
-                        <Link href="/flashcards">
-                            <Button className="bg-[#D4AF37] hover:bg-[#B89830] text-white font-bold h-14 px-10 rounded-2xl shadow-xl border-b-4 border-[#A6892C] transition-all transform hover:-translate-y-1 active:translate-y-0 group">
-                                <Sparkles className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
-                                Flashcards
-                            </Button>
-                        </Link>
-                    )}
                 </div>
 
-                {/* Multiple Pathways View */}
+
+            </div>
+
+            {/* Multiple Pathways View - Now takes up remaining space */}
+            <div className="flex-1 min-h-0 container mx-auto px-4 pb-6">
                 <PathwayView
                     pathways={pathways}
                     scenarios={scenarios}
