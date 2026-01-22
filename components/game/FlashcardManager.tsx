@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, BookOpen, Volume2 } from "lucide-react";
+import { Trash2, BookOpen, Volume2, GraduationCap, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
@@ -57,12 +57,20 @@ export function FlashcardManager({ flashcards }: FlashcardManagerProps) {
                 <div className="flex flex-wrap gap-4">
                     <AddFlashcardDialog />
                     {flashcards.length >= 4 && (
-                        <Button
-                            onClick={() => router.push("/review")}
-                            className="bg-[#D4AF37] hover:bg-[#B89830] text-white rounded-xl h-12 px-6 shadow-lg border-b-4 border-[#A6892C] transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:border-b-0"
-                        >
-                            <BookOpen className="w-5 h-5 mr-2" /> Start Review
-                        </Button>
+                        <>
+                            <Button
+                                onClick={() => router.push("/review?mode=quiz")}
+                                className="bg-[#D4AF37] hover:bg-[#B89830] text-white rounded-xl h-12 px-6 shadow-lg border-b-4 border-[#A6892C] transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:border-b-0"
+                            >
+                                <GraduationCap className="w-5 h-5 mr-2" /> Quiz Mode
+                            </Button>
+                            <Button
+                                onClick={() => router.push("/review?mode=learning")}
+                                className="bg-[#C41E3A] hover:bg-[#A01830] text-white rounded-xl h-12 px-6 shadow-lg border-b-4 border-[#801326] transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:border-b-0"
+                            >
+                                <Brain className="w-5 h-5 mr-2" /> Learning Mode
+                            </Button>
+                        </>
                     )}
                 </div>
             </div>
