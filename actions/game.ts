@@ -143,10 +143,20 @@ export async function submitMessage(conversationId: string, content: string) {
                 });
             }
 
-            // DELETE messages and conversation to save storage (as requested)
+            // DELETE messages to save storage (as requested) but KEEP conversation for progress tracking
             // Note: We've already gathered the feedback so we can return it to the UI
             await db.message.deleteMany({ where: { conversationId } });
-            await db.conversation.delete({ where: { id: conversationId } });
+            // Update status and feedback details instead of deleting
+            await db.conversation.update({
+                where: { id: conversationId },
+                data: {
+                    status: "COMPLETED",
+                    feedback: coachReport.feedback,
+                    score: coachReport.score,
+                    corrections: enrichedCorrections as any,
+                    suggestedFlashcards: coachReport.suggestedFlashcards as any
+                }
+            });
         } else {
             // For FAILED or if no userId, we can keep it or delete it. 
             // Usually, we'd only persist mastery on COMPLETED.

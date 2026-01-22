@@ -14,6 +14,12 @@ export function Header() {
                 </Link>
 
                 <nav className="flex items-center gap-6">
+                    <SignedIn>
+                        <Link href="/dashboard" className="text-sm font-medium text-[#5C4B3A] hover:text-[#C41E3A] transition-colors">
+                            Dashboard
+                        </Link>
+                    </SignedIn>
+
                     <Link href="/stages" className="text-sm font-medium text-[#5C4B3A] hover:text-[#C41E3A] transition-colors">
                         Your Journey
                     </Link>
