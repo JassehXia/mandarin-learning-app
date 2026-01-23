@@ -9,6 +9,9 @@ import { MessageItem } from "./MessageItem";
 import { CoachReport } from "./CoachReport";
 import { ChatInput } from "./ChatInput";
 import { WarmupGame } from "./WarmupGame";
+import { SelectionToolbar } from "./SelectionToolbar";
+import { AddFlashcardDialog } from "./AddFlashcardDialog";
+import { translateSelection } from "@/actions/flashcards";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface Message {
@@ -64,6 +67,8 @@ export function ChatInterface({
     const [isPlaying, setIsPlaying] = useState<string | null>(null);
     const [showCheatSheet, setShowCheatSheet] = useState(false);
     const [showWarmup, setShowWarmup] = useState(true);
+    const [selectionData, setSelectionData] = useState<{ hanzi: string; pinyin: string; meaning: string } | null>(null);
+    const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const toggleTranslation = (id: string) => {
@@ -132,6 +137,22 @@ export function ChatInterface({
             setIsLoading(false);
         }
     }
+
+    const handleSelectionAction = async (text: string) => {
+        // Clear previous data and open dialog in 'loading' state if desired, 
+        // but here we fetch first then open for a smoother feel
+        try {
+            const data = await translateSelection(text);
+            setSelectionData({
+                hanzi: text,
+                pinyin: data.pinyin,
+                meaning: data.meaning
+            });
+            setIsFlashcardOpen(true);
+        } catch (error) {
+            console.error("Failed to translate selection:", error);
+        }
+    };
 
     return (
         <div className="flex h-screen flex-col bg-[#FDFBF7] text-[#2C2C2C] font-sans">
@@ -236,6 +257,14 @@ export function ChatInterface({
                     isLoading={isLoading}
                 />
             )}
+
+            <SelectionToolbar onAction={handleSelectionAction} />
+
+            <AddFlashcardDialog
+                open={isFlashcardOpen}
+                onOpenChange={setIsFlashcardOpen}
+                initialData={selectionData}
+            />
         </div>
     );
 }

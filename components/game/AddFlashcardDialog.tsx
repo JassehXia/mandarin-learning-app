@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,10 +18,29 @@ import { saveFlashcard } from "@/actions/flashcards";
 import { convertToToneMarks } from "@/lib/pinyin-input-util";
 import { useRouter } from "next/navigation";
 
-export function AddFlashcardDialog() {
-    const [open, setOpen] = useState(false);
+interface AddFlashcardDialogProps {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    initialData?: {
+        hanzi: string;
+        pinyin: string;
+        meaning: string;
+    } | null;
+    trigger?: React.ReactNode;
+}
+
+export function AddFlashcardDialog({
+    open: controlledOpen,
+    onOpenChange: setControlledOpen,
+    initialData,
+    trigger
+}: AddFlashcardDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+    const setOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
 
     const [formData, setFormData] = useState({
         hanzi: "",
@@ -29,6 +48,17 @@ export function AddFlashcardDialog() {
         meaning: "",
         explanation: "",
     });
+
+    useEffect(() => {
+        if (initialData && open) {
+            setFormData({
+                hanzi: initialData.hanzi || "",
+                pinyin: initialData.pinyin || "",
+                meaning: initialData.meaning || "",
+                explanation: "",
+            });
+        }
+    }, [initialData, open]);
 
     const handlePinyinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -55,14 +85,22 @@ export function AddFlashcardDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button className="bg-[#C41E3A] hover:bg-[#A01830] text-white rounded-xl h-12 px-6 shadow-lg border-b-4 border-[#801326] transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:border-b-0">
-                    <Plus className="w-5 h-5 mr-2" /> Add Flashcard
-                </Button>
-            </DialogTrigger>
+            {trigger ? (
+                <DialogTrigger asChild>{trigger}</DialogTrigger>
+            ) : (
+                controlledOpen === undefined && (
+                    <DialogTrigger asChild>
+                        <Button className="bg-[#C41E3A] hover:bg-[#A01830] text-white rounded-xl h-12 px-6 shadow-lg border-b-4 border-[#801326] transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:border-b-0">
+                            <Plus className="w-5 h-5 mr-2" /> Add Flashcard
+                        </Button>
+                    </DialogTrigger>
+                )
+            )}
             <DialogContent className="sm:max-w-[425px] bg-[#FDFBF7] border-2 border-[#EAD0A8] rounded-3xl">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-serif font-black text-[#C41E3A]">New Flashcard</DialogTitle>
+                    <DialogTitle className="text-2xl font-serif font-black text-[#C41E3A]">
+                        {initialData ? "Quick Flashcard" : "New Flashcard"}
+                    </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-6 pt-4">
                     <div className="space-y-2">

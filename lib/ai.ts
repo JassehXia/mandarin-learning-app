@@ -136,3 +136,33 @@ export async function getHanziFromPinyin(pinyin: string): Promise<string> {
 }
 
 
+
+export async function translateSelection(text: string): Promise<{ pinyin: string; meaning: string }> {
+    try {
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'Translate the following Chinese snippet to English. Return ONLY JSON in this format: {"pinyin": "...", "meaning": "..."}. Pinyin should use tone marks.'
+                },
+                {
+                    role: 'user',
+                    content: text
+                }
+            ],
+            temperature: 0.3,
+            max_tokens: 150,
+            response_format: { type: "json_object" },
+        });
+
+        const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+        return {
+            pinyin: result.pinyin || "",
+            meaning: result.meaning || ""
+        };
+    } catch (error) {
+        console.error("AI Translation failed:", error);
+        return { pinyin: "", meaning: "" };
+    }
+}

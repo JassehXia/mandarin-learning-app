@@ -1,8 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MapPin, RotateCcw, Lightbulb } from "lucide-react";
+import { MapPin, RotateCcw, Lightbulb, Info } from "lucide-react";
 import { restartGame } from "@/actions/game";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface ChatHUDProps {
     location: string;
@@ -33,10 +40,26 @@ export function ChatHUD({
                     <span>{location}</span>
                 </div>
                 <div className="hidden sm:block h-4 w-px bg-[#E8E1D5]" />
-                <div className="text-[#5C4B3A] text-[10px] sm:text-sm line-clamp-1 text-center sm:text-left">
-                    <span className="font-bold mr-1 sm:mr-2 text-[#D4AF37]">Objective:</span>
-                    {objective}
-                </div>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <button className="text-[#5C4B3A] text-[10px] sm:text-sm line-clamp-1 text-center sm:text-left hover:text-[#C41E3A] transition-colors group/obj flex items-center gap-1.5 focus:outline-none">
+                            <span className="font-bold text-[#D4AF37] whitespace-nowrap">Objective:</span>
+                            <span className="truncate">{objective}</span>
+                            <Info className="w-3 h-3 opacity-0 group-hover/obj:opacity-100 transition-opacity shrink-0" />
+                        </button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#FDFBF7] border-2 border-[#E8E1D5] rounded-3xl sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="font-serif text-[#C41E3A] text-xl flex items-center gap-2">
+                                <MapPin className="w-5 h-5" />
+                                Your Objective
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="mt-4 p-5 bg-white rounded-2xl border border-[#E8E1D5] shadow-inner text-[#5C4B3A] leading-relaxed">
+                            {objective}
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
             <div className="flex items-center gap-3">
                 <Button

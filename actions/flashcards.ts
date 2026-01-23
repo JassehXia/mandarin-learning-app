@@ -68,3 +68,11 @@ export async function deleteFlashcard(id: string) {
     revalidatePath("/flashcards");
     revalidatePath("/review");
 }
+
+export async function translateSelection(text: string) {
+    const user = await getOrCreateUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const { translateSelection: aiTranslate } = await import("@/lib/ai");
+    return aiTranslate(text);
+}
