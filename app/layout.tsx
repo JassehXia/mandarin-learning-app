@@ -25,6 +25,7 @@ export default function RootLayout({
         <body className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-stone-50 text-stone-900`}>
           <Header />
           {children}
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
