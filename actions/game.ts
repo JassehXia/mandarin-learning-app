@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma as db } from "@/lib/prisma"; // Use the singleton
-import { chatWithCharacter, generateFeedback, getHanziFromPinyin } from "@/lib/ai";
+import { chatWithCharacter, generateFeedback, getHanziFromPinyin, summarizeHistory } from "@/lib/ai";
 import { revalidatePath } from "next/cache";
 import { getOrCreateUser } from "@/lib/auth-util";
 import { pinyin } from "pinyin-pro";
@@ -74,14 +74,25 @@ export async function submitMessage(conversationId: string, content: string) {
     });
 
     // 3. Prepare History for AI
-    const history = messages.map(m => ({
+    let fullHistory = messages.map(m => ({
         role: m.role as 'user' | 'assistant',
         content: m.content
     }));
-    history.push({ role: 'user', content });
+    fullHistory.push({ role: 'user', content });
 
-    // 4. Run AI
-    const aiResponse = await chatWithCharacter(history, character.personalityPrompt, scenario.objective);
+    // 4. Summarization Logic (Token Optimization)
+    let finalHistory = fullHistory;
+    let summary = undefined;
+
+    if (fullHistory.length > 6) {
+        const messagesToSummarize = fullHistory.slice(0, -6);
+        finalHistory = fullHistory.slice(-6); // Only last 6 full messages
+        summary = await summarizeHistory(messagesToSummarize as any);
+        console.log(`[Token Opt] Summarized ${messagesToSummarize.length} messages.`);
+    }
+
+    // 5. Run AI
+    const aiResponse = await chatWithCharacter(finalHistory as any, character.personalityPrompt, scenario.objective, summary);
 
     // 5. Generate Pinyin Server-Side
     const cleanedContent = aiResponse.content.replace(/\s+/g, '');
@@ -108,7 +119,7 @@ export async function submitMessage(conversationId: string, content: string) {
     if (aiResponse.status !== "ACTIVE") {
         // Conversation just ended, get coach feedback
         const coachReport = await generateFeedback(
-            [...history, { role: 'assistant', content: aiResponse.content }],
+            [...fullHistory, { role: 'assistant', content: aiResponse.content }],
             scenario.title,
             scenario.objective
         );

@@ -33,17 +33,17 @@ async function main() {
 
     // 2. Create Characters
     const c = {
-        zhang: await prisma.character.create({ data: { name: "Driver Zhang", role: "Taxi Driver", personalityPrompt: "Friendly but impatient Shanghai taxi driver." } }),
-        auntie: await prisma.character.create({ data: { name: "Auntie Wang", role: "Food Vendor", personalityPrompt: "Loud, enthusiastic dumpling stall owner." } }),
-        mei: await prisma.character.create({ data: { name: "Mei", role: "Boba Clerk", personalityPrompt: "Trendy, high-energy bubble tea clerk." } }),
-        li: await prisma.character.create({ data: { name: "Li Jie", role: "Store Clerk", personalityPrompt: "Busy but helpful grocery clerk." } }),
-        chen: await prisma.character.create({ data: { name: "Mr. Chen", role: "Local", personalityPrompt: "Kind elderly man who knows the area." } }),
-        xiao: await prisma.character.create({ data: { name: "Xiao Ming", role: "Friend", personalityPrompt: "Casual, flexible friend using slang." } }),
-        manager: await prisma.character.create({ data: { name: "Manager Lin", role: "Receptionist", personalityPrompt: "Formal, polite hotel manager." } }),
-        lao: await prisma.character.create({ data: { name: "Lao Li", role: "Vendor", personalityPrompt: "Crafty souvenir vendor who loves to bargain." } }),
-        teacher: await prisma.character.create({ data: { name: "Teacher Zhang", role: "Professor", personalityPrompt: "Patient but firm Chinese language teacher." } }),
-        student: await prisma.character.create({ data: { name: "Wei Wei", role: "Classmate", personalityPrompt: "Friendly and helpful international student." } }),
-        relative: await prisma.character.create({ data: { name: "Uncle Wong", role: "Elder Relative", personalityPrompt: "Traditional, warm-hearted uncle who loves asking about your life." } }),
+        zhang: await prisma.character.create({ data: { name: "Driver Zhang", role: "Taxi Driver", personalityPrompt: "Friendly but impatient Shanghai taxi driver. He talks about local traffic and expects the user to know their destination. If the user is slow, he might mutter about being in a hurry." } }),
+        auntie: await prisma.character.create({ data: { name: "Auntie Wang", role: "Food Vendor", personalityPrompt: "Loud, enthusiastic dumpling stall owner. She uses local Shanghai-flavored Mandarin and is very pushy about upselling extra toppings. She loves it when students talk to her." } }),
+        mei: await prisma.character.create({ data: { name: "Mei", role: "Boba Clerk", personalityPrompt: "Trendy, high-energy bubble tea clerk. She speaks quickly, uses modern slang, and is very pushy about upselling toppings like pearls or cheese foam." } }),
+        li: await prisma.character.create({ data: { name: "Li Jie", role: "Store Clerk", personalityPrompt: "Busy but helpful grocery clerk. Professional and concise." } }),
+        chen: await prisma.character.create({ data: { name: "Mr. Chen", role: "Local", personalityPrompt: "Kind elderly man who knows the area. He speaks slowly and loves sharing local lore and advice." } }),
+        xiao: await prisma.character.create({ data: { name: "Xiao Ming", role: "Friend", personalityPrompt: "Casual, flexible friend who uses lots of slang and emojis in conversation." } }),
+        manager: await prisma.character.create({ data: { name: "Manager Lin", role: "Receptionist", personalityPrompt: "Formal, polite hotel manager who takes pride in service and uses honorifics." } }),
+        lao: await prisma.character.create({ data: { name: "Lao Li", role: "Vendor", personalityPrompt: "Crafty souvenir vendor who loves to bargain and will start with high prices." } }),
+        teacher: await prisma.character.create({ data: { name: "Teacher Zhang", role: "Professor", personalityPrompt: "Patient but firm Chinese language teacher who will correct your grammar if it's too messy." } }),
+        student: await prisma.character.create({ data: { name: "Wei Wei", role: "Classmate", personalityPrompt: "Friendly and helpful international student who is also learning Mandarin." } }),
+        relative: await prisma.character.create({ data: { name: "Uncle Wong", role: "Elder Relative", personalityPrompt: "Traditional, warm-hearted uncle who loves asking about your job and relationship status." } }),
     };
 
     console.log("Characters created.");
@@ -83,7 +83,7 @@ async function main() {
         data: {
             title: "Morning Jīnbǐng",
             description: "Buy breakfast from a street stall.",
-            objective: "Order a savory pancake with cilantro and extra chili.",
+            objective: "Order a savory pancake (Jianbing) with cilantro and extra chili. Specifically ask for NO onions and check if you can pay with WeChat Pay.",
             difficulty: "Beginner",
             location: "Street Corner",
             characterId: c.auntie.id,
@@ -92,7 +92,9 @@ async function main() {
             keyPhrases: [
                 { phrase: "煎饼", pinyin: "jiānbǐng", translation: "savory pancake" },
                 { phrase: "香菜", pinyin: "xiāngcài", translation: "cilantro" },
-                { phrase: "加辣", pinyin: "jiā là", translation: "add chili/spicy" }
+                { phrase: "加辣", pinyin: "jiā là", translation: "add chili/spicy" },
+                { phrase: "不要洋葱", pinyin: "búyào yángcōng", translation: "no onions" },
+                { phrase: "微信支付", pinyin: "wēixìn zhīfù", translation: "WeChat Pay" }
             ]
         }
     });
@@ -101,12 +103,18 @@ async function main() {
         data: {
             title: "Park Exercise",
             description: "Join locals for morning exercises.",
-            objective: "Ask if you can join and what the movements are called.",
+            objective: "Approach Mr. Chen in the park. Politey ask to join the Tai Chi group for a morning session and specifically ask what the 'Bird's Tail' movement is called in Chinese.",
             difficulty: "Beginner",
             location: "Public Park",
             characterId: c.chen.id,
             pathwayId: p.life.id,
             x: 20, y: 45,
+            keyPhrases: [
+                { phrase: "太极拳", pinyin: "tàijíquán", translation: "Tai Chi" },
+                { phrase: "跟你们一起", pinyin: "gēn nǐmen yīqǐ", translation: "with you all" },
+                { phrase: "招式", pinyin: "zhāoshì", translation: "movements/forms" },
+                { phrase: "揽雀尾", pinyin: "lǎn què wěi", translation: "Grasp the Bird's Tail" }
+            ],
             prerequisites: { connect: [{ id: breakfast.id }] }
         }
     });
@@ -115,7 +123,7 @@ async function main() {
         data: {
             title: "Dìdidǎchē",
             description: "Call a ride-share to your office.",
-            objective: "Confirm your destination and ask about traffic.",
+            objective: "Confirm your destination at the Century Park entrance. Ask the driver to avoid the elevated highway if there's a traffic jam and ask for an estimated arrival time.",
             difficulty: "Beginner",
             location: "Sidewalk",
             characterId: c.zhang.id,
@@ -124,7 +132,9 @@ async function main() {
             keyPhrases: [
                 { phrase: "目的地", pinyin: "mùdìdì", translation: "destination" },
                 { phrase: "堵车", pinyin: "dǔchē", translation: "traffic jam" },
-                { phrase: "师傅", pinyin: "shīfu", translation: "master/driver (polite)" }
+                { phrase: "师傅", pinyin: "shīfu", translation: "master/driver (polite)" },
+                { phrase: "高架桥", pinyin: "gāojiàqiáo", translation: "elevated highway" },
+                { phrase: "大概几点到", pinyin: "dàgài jǐdiǎn dào", translation: "roughly what time arrive" }
             ],
             prerequisites: { connect: [{ id: breakfast.id }] }
         }
@@ -134,7 +144,7 @@ async function main() {
         data: {
             title: "Phone Repair",
             description: "Your screen is cracked.",
-            objective: "Ask how much it costs to fix and how long.",
+            objective: "Explain to the technician that your screen is flickering and touch isn't working. Ask how much it costs to fix and if it can be ready in under 2 hours.",
             difficulty: "Advanced",
             location: "Repair Stall",
             characterId: c.zhang.id,
@@ -144,7 +154,9 @@ async function main() {
                 { phrase: "屏幕", pinyin: "píngmù", translation: "screen" },
                 { phrase: "坏了", pinyin: "huài le", translation: "broken" },
                 { phrase: "修理", pinyin: "xiūlǐ", translation: "to repair" },
-                { phrase: "多久", pinyin: "duōjiǔ", translation: "how long" }
+                { phrase: "闪烁", pinyin: "shǎnshuò", translation: "flicker" },
+                { phrase: "触摸没反应", pinyin: "chùmō méi fǎnyìng", translation: "touch no response" },
+                { phrase: "两小时以内", pinyin: "liǎng xiǎoshí yǐnèi", translation: "within two hours" }
             ],
             prerequisites: { connect: [{ id: commute.id }] }
         }
@@ -154,7 +166,7 @@ async function main() {
         data: {
             title: "The Coffee Run",
             description: "Get your caffeine fix before the big meeting.",
-            objective: "Order an iced latte with oat milk.",
+            objective: "Order a large iced latte with oat milk, less ice, and no sugar. Ask for a cup sleeve because it's too cold to hold.",
             difficulty: "Beginner",
             location: "Cafe",
             characterId: c.mei.id,
@@ -163,7 +175,10 @@ async function main() {
             keyPhrases: [
                 { phrase: "冰拿铁", pinyin: "bīng nátuǐ", translation: "iced latte" },
                 { phrase: "燕麦奶", pinyin: "yànmàinǎi", translation: "oat milk" },
-                { phrase: "打包", pinyin: "dǎbāo", translation: "to go / take out" }
+                { phrase: "打包", pinyin: "dǎbāo", translation: "to go / take out" },
+                { phrase: "少冰", pinyin: "shǎo bīng", translation: "less ice" },
+                { phrase: "无糖", pinyin: "wú táng", translation: "no sugar" },
+                { phrase: "杯套", pinyin: "bēitào", translation: "cup sleeve" }
             ],
             prerequisites: { connect: [{ id: commute.id }] }
         }
@@ -173,12 +188,19 @@ async function main() {
         data: {
             title: "Sending a Package",
             description: "Ship a souvenir back home.",
-            objective: "Ask for the price of shipping to your country.",
+            objective: "Tell Manager Lin you want to ship a fragile package to the US via air mail. Ask for the price per kilogram and when it's expected to arrive.",
             difficulty: "Intermediate",
             location: "Post Office",
             characterId: c.manager.id,
             pathwayId: p.life.id,
             x: 50, y: 165,
+            keyPhrases: [
+                { phrase: "寄包裹", pinyin: "jì bāoguǒ", translation: "ship a package" },
+                { phrase: "易碎品", pinyin: "yìsuìpǐn", translation: "fragile item" },
+                { phrase: "航空件", pinyin: "hángkōngjiàn", translation: "air mail" },
+                { phrase: "每斤多少钱", pinyin: "měi jīn duōshǎo qián", translation: "how much per jin/kg" },
+                { phrase: "预计达时间", pinyin: "yùjì dào shíjiān", translation: "expected arrival time" }
+            ],
             prerequisites: { connect: [{ id: commute.id }] }
         }
     });
@@ -215,12 +237,19 @@ async function main() {
         data: {
             title: "At the Pharmacy",
             description: "You have a slight headache.",
-            objective: "Explain your symptoms and ask for medicine.",
+            objective: "Explain to Li Jie that you have a headache and a sore throat. Ask for a recommendation for traditional liquid medicine and specifically ask if it will make you drowsy.",
             difficulty: "Intermediate",
             location: "Pharmacy",
             characterId: c.li.id,
             pathwayId: p.life.id,
             x: 50, y: 225,
+            keyPhrases: [
+                { phrase: "头疼", pinyin: "tóuténg", translation: "headache" },
+                { phrase: "嗓子痛", pinyin: "sǎngzi tòng", translation: "sore throat" },
+                { phrase: "中成药", pinyin: "zhōngchéngyào", translation: "traditional Chinese medicine" },
+                { phrase: "副作用", pinyin: "fùzuòyòng", translation: "side effects" },
+                { phrase: "犯困", pinyin: "fànkùn", translation: "to feel sleepy" }
+            ],
             prerequisites: { connect: [{ id: coffee.id }, { id: postOffice.id }] }
         }
     });
@@ -257,12 +286,19 @@ async function main() {
         data: {
             title: "Hot Pot Dinner",
             description: "Meet Xiao Ming for dinner.",
-            objective: "Discuss your day and order spicy broth.",
+            objective: "Meet Xiao Ming at the restaurant. Suggest ordering a 'Half-and-Half' pot with spicy and clear broth. Ask for recommendations on his favorite dipping sauce ingredients.",
             difficulty: "Intermediate",
             location: "Hot Pot Restaurant",
             characterId: c.xiao.id,
             pathwayId: p.life.id,
             x: 50, y: 285,
+            keyPhrases: [
+                { phrase: "鸳鸯锅", pinyin: "yuānyāng guō", translation: "Half-and-Half pot" },
+                { phrase: "清汤", pinyin: "qīngtāng", translation: "clear broth" },
+                { phrase: "麻辣", pinyin: "málà", translation: "numbing and spicy" },
+                { phrase: "蘸料", pinyin: "zhànliào", translation: "dipping sauce" },
+                { phrase: "调料台", pinyin: "tiáoliào tái", translation: "sauce station" }
+            ],
             prerequisites: { connect: [{ id: laundry.id }, { id: haircut.id }] }
         }
     });
@@ -314,12 +350,19 @@ async function main() {
         data: {
             title: "Student Reg",
             description: "Register for your new semester.",
-            objective: "Confirm your major and get your ID card.",
+            objective: "Confirm your major as 'International Business' and get your ID card. Ask Manager Lin where the main student canteen is located.",
             difficulty: "Beginner",
             location: "Admin Building",
             characterId: c.manager.id,
             pathwayId: p.school.id,
             x: 50, y: 15,
+            keyPhrases: [
+                { phrase: "报到", pinyin: "bàodào", translation: "to register/report" },
+                { phrase: "专业", pinyin: "zhuānyè", translation: "major" },
+                { phrase: "国际商务", pinyin: "guójì shāngwù", translation: "International Business" },
+                { phrase: "学生证", pinyin: "xuéshengzhèng", translation: "student ID" },
+                { phrase: "食堂", pinyin: "shítáng", translation: "canteen" }
+            ]
         }
     });
 
@@ -327,12 +370,19 @@ async function main() {
         data: {
             title: "Dorm Check-in",
             description: "Get your room keys and meeting rules.",
-            objective: "Ask about the laundry and curfew times.",
+            objective: "Ask about the laundry room location and if there's a curfew. Specifically ask if you can bring a small electric kettle into the room.",
             difficulty: "Beginner",
             location: "Dormitory",
             characterId: c.manager.id,
             pathwayId: p.school.id,
             x: 80, y: 45,
+            keyPhrases: [
+                { phrase: "宿舍", pinyin: "sùshè", translation: "dormitory" },
+                { phrase: "洗衣房", pinyin: "xǐyīfáng", translation: "laundry room" },
+                { phrase: "门禁", pinyin: "ménjìn", translation: "curfew" },
+                { phrase: "电水壶", pinyin: "diànshuǐhú", translation: "electric kettle" },
+                { phrase: "宿管", pinyin: "sùguǎn", translation: "dorm manager" }
+            ],
             prerequisites: { connect: [{ id: registration.id }] }
         }
     });
@@ -341,12 +391,19 @@ async function main() {
         data: {
             title: "Finding Class",
             description: "You're late for your first lecture.",
-            objective: "Ask a student for directions to Room 302.",
+            objective: "Ask Wei Wei for directions to Room 302. Explain that you're a new student and seem a bit lost.",
             difficulty: "Beginner",
             location: "Campus Hallway",
             characterId: c.student.id,
             pathwayId: p.school.id,
             x: 50, y: 75,
+            keyPhrases: [
+                { phrase: "教学楼", pinyin: "jiàoxuélóu", translation: "teaching building" },
+                { phrase: "请问...怎么走", pinyin: "qǐngwèn... zěnme zǒu", translation: "excuse me, how to get to..." },
+                { phrase: "迷路了", pinyin: "mílù le", translation: "to be lost" },
+                { phrase: "新生", pinyin: "xīnshēng", translation: "new student" },
+                { phrase: "找教室", pinyin: "zhǎo jiàoshì", translation: "find classroom" }
+            ],
             prerequisites: { connect: [{ id: registration.id }] }
         }
     });
@@ -524,12 +581,19 @@ async function main() {
         data: {
             title: "Feast Prep",
             description: "Buy decorations and food with Uncle Wong.",
-            objective: "Pick out red lanterns and fish for the dinner.",
+            objective: "Buy red lanterns and fish with Uncle Wong. Specifically ask the vendor for 'thick' lanterns and a 'fat' fish for good luck.",
             difficulty: "Beginner",
             location: "Shopping Street",
             characterId: c.relative.id,
             pathwayId: p.cny.id,
             x: 50, y: 15,
+            keyPhrases: [
+                { phrase: "红灯笼", pinyin: "hóng dēnglóng", translation: "red lanterns" },
+                { phrase: "厚实", pinyin: "hòushi", translation: "thick/sturdy" },
+                { phrase: "肥鱼", pinyin: "féiyú", translation: "fat fish" },
+                { phrase: "挑选", pinyin: "tiāoxuǎn", translation: "to pick/choose" },
+                { phrase: "年货", pinyin: "niánhuò", translation: "New Year goods" }
+            ]
         }
     });
 
@@ -537,12 +601,19 @@ async function main() {
         data: {
             title: "Nian Nian You Yu",
             description: "Buy the symbolic fish for dinner.",
-            objective: "Ask for a fresh perch and express its meaning.",
+            objective: "Ask Auntie Wang for a fresh perch and express its meaning for the New Year. See if you can get a discount if you buy two.",
             difficulty: "Beginner",
             location: "Fish Market",
             characterId: c.auntie.id,
             pathwayId: p.cny.id,
             x: 20, y: 50,
+            keyPhrases: [
+                { phrase: "鲜鱼", pinyin: "xiānyú", translation: "fresh fish" },
+                { phrase: "鲈鱼", pinyin: "lúyú", translation: "perch" },
+                { phrase: "年年有余", pinyin: "niánnián yǒuyú", translation: "abundance every year" },
+                { phrase: "便宜一点", pinyin: "piányi yīdiǎn", translation: "a bit cheaper" },
+                { phrase: "新鲜", pinyin: "xīnxiān", translation: "fresh" }
+            ],
             prerequisites: { connect: [{ id: preparations.id }] }
         }
     });
@@ -565,12 +636,19 @@ async function main() {
         data: {
             title: "Dumpling Joy",
             description: "Learn to fold dumplings.",
-            objective: "Ask about the filling and show your effort.",
+            objective: "Ask Uncle Wong about the filling ingredients. Propose a competition to see who can wrap the most 'lucky' dumplings with a coin inside.",
             difficulty: "Beginner",
             location: "Kitchen",
             characterId: c.relative.id,
             pathwayId: p.cny.id,
             x: 80, y: 120,
+            keyPhrases: [
+                { phrase: "馅儿", pinyin: "xiànr", translation: "filling" },
+                { phrase: "包饺子", pinyin: "bāo jiǎozi", translation: "wrap dumplings" },
+                { phrase: "硬币", pinyin: "yìngbì", translation: "coin" },
+                { phrase: "运气", pinyin: "yùnqi", translation: "luck" },
+                { phrase: "比一比", pinyin: "bǐ yī bǐ", translation: "to compete/compare" }
+            ],
             prerequisites: { connect: [{ id: greetings.id }] }
         }
     });

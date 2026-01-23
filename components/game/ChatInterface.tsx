@@ -8,6 +8,8 @@ import { CheatSheetPanel } from "./CheatSheetPanel";
 import { MessageItem } from "./MessageItem";
 import { CoachReport } from "./CoachReport";
 import { ChatInput } from "./ChatInput";
+import { WarmupGame } from "./WarmupGame";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface Message {
     id: string;
@@ -61,6 +63,7 @@ export function ChatInterface({
     const [visibleTranslations, setVisibleTranslations] = useState<Set<string>>(new Set());
     const [isPlaying, setIsPlaying] = useState<string | null>(null);
     const [showCheatSheet, setShowCheatSheet] = useState(false);
+    const [showWarmup, setShowWarmup] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const toggleTranslation = (id: string) => {
@@ -144,67 +147,95 @@ export function ChatInterface({
             />
 
             <div className="flex-1 relative overflow-hidden flex flex-col">
-                {showCheatSheet && (
-                    <CheatSheetPanel
-                        keyPhrases={scenario.keyPhrases}
-                        onPlayAudio={playText}
-                        isPlaying={isPlaying}
-                        difficulty={scenario.difficulty}
-                    />
-                )}
-
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm border border-[#E8E1D5] px-4 py-1 rounded-full text-xs text-[#5C4B3A] shadow-sm z-10 pointer-events-none">
-                    Talking to: <span className="font-bold text-[#C41E3A]">{scenario.character.name}</span> ({scenario.character.role})
-                </div>
-
-                <ScrollArea className="flex-1 px-4 md:px-6">
-                    <div className="flex flex-col gap-6 max-w-3xl mx-auto pt-12 pb-4">
-                        {messages.map((msg) => (
-                            <MessageItem
-                                key={msg.id}
-                                message={msg}
-                                onPlayAudio={playText}
-                                isPlaying={isPlaying}
-                                isTranslationVisible={visibleTranslations.has(msg.id)}
-                                onToggleTranslation={toggleTranslation}
-                                difficulty={scenario.difficulty}
-                            />
-                        ))}
-                        {isLoading && (
-                            <div className="flex justify-start">
-                                <div className="bg-white border border-[#E8E1D5] px-5 py-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1">
-                                    <div className="w-1.5 h-1.5 bg-[#C41E3A] rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                                    <div className="w-1.5 h-1.5 bg-[#C41E3A] rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                                    <div className="w-1.5 h-1.5 bg-[#C41E3A] rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                                </div>
+                <AnimatePresence mode="wait">
+                    {showWarmup && scenario.keyPhrases?.length > 0 ? (
+                        <motion.div
+                            key="warmup"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
+                            className="absolute inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-[#FDFBF7]"
+                        >
+                            <div className="w-full max-w-4xl">
+                                <WarmupGame
+                                    keyPhrases={scenario.keyPhrases}
+                                    onComplete={() => setShowWarmup(false)}
+                                />
                             </div>
-                        )}
-                        <div ref={scrollRef} className="h-4" />
-                    </div>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="chat"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex-1 flex flex-col overflow-hidden"
+                        >
+                            {showCheatSheet && (
+                                <CheatSheetPanel
+                                    keyPhrases={scenario.keyPhrases}
+                                    onPlayAudio={playText}
+                                    isPlaying={isPlaying}
+                                    difficulty={scenario.difficulty}
+                                />
+                            )}
 
-                    {gameStatus !== "ACTIVE" && feedback && (
-                        <CoachReport
-                            status={gameStatus}
-                            score={score}
-                            feedback={feedback}
-                            corrections={corrections}
-                            suggestedFlashcards={suggestedFlashcards}
-                            conversationId={conversationId}
-                            scenarioId={scenario.id}
-                            onPlayAudio={playText}
-                            isPlaying={isPlaying}
-                        />
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm border border-[#E8E1D5] px-4 py-1 rounded-full text-xs text-[#5C4B3A] shadow-sm z-10 pointer-events-none">
+                                Talking to: <span className="font-bold text-[#C41E3A]">{scenario.character.name}</span> ({scenario.character.role})
+                            </div>
+
+                            <ScrollArea className="flex-1 px-4 md:px-6">
+                                <div className="flex flex-col gap-6 max-w-3xl mx-auto pt-12 pb-4">
+                                    {messages.map((msg) => (
+                                        <MessageItem
+                                            key={msg.id}
+                                            message={msg}
+                                            onPlayAudio={playText}
+                                            isPlaying={isPlaying}
+                                            isTranslationVisible={visibleTranslations.has(msg.id)}
+                                            onToggleTranslation={toggleTranslation}
+                                            difficulty={scenario.difficulty}
+                                        />
+                                    ))}
+                                    {isLoading && (
+                                        <div className="flex justify-start">
+                                            <div className="bg-white border border-[#E8E1D5] px-5 py-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1">
+                                                <div className="w-1.5 h-1.5 bg-[#C41E3A] rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                                                <div className="w-1.5 h-1.5 bg-[#C41E3A] rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                                                <div className="w-1.5 h-1.5 bg-[#C41E3A] rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div ref={scrollRef} className="h-4" />
+                                </div>
+
+                                {gameStatus !== "ACTIVE" && feedback && (
+                                    <CoachReport
+                                        status={gameStatus}
+                                        score={score}
+                                        feedback={feedback}
+                                        corrections={corrections}
+                                        suggestedFlashcards={suggestedFlashcards}
+                                        conversationId={conversationId}
+                                        scenarioId={scenario.id}
+                                        onPlayAudio={playText}
+                                        isPlaying={isPlaying}
+                                    />
+                                )}
+                            </ScrollArea>
+                        </motion.div>
                     )}
-                </ScrollArea>
+                </AnimatePresence>
             </div>
 
-            <ChatInput
-                input={input}
-                setInput={setInput}
-                onSubmit={handleSubmit}
-                disabled={gameStatus !== "ACTIVE" || isLoading}
-                isLoading={isLoading}
-            />
+            {!showWarmup && (
+                <ChatInput
+                    input={input}
+                    setInput={setInput}
+                    onSubmit={handleSubmit}
+                    disabled={gameStatus !== "ACTIVE" || isLoading}
+                    isLoading={isLoading}
+                />
+            )}
         </div>
     );
 }

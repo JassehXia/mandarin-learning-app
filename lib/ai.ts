@@ -13,30 +13,19 @@ export async function chatWithCharacter(
     history: ChatMessage[],
     characterPrompt: string,
     objective: string,
+    summary?: string,
     userName: string = "Traveler"
 ): Promise<{ content: string; translation: string; status: 'ACTIVE' | 'COMPLETED' | 'FAILED' }> {
     const systemMessage: ChatMessage = {
         role: 'system',
         content: `Roleplay: ${characterPrompt}
-User: ${userName}
-Goal: ${objective}
-Rules:
-1. Speak Mandarin (Simplified).
-2. GM Mode: Evaluate if Goal is achieved.
-3. FAIL if off-track/insulting.
-Return JSON:
-{
-  "content": "Mandarin response",
-  "translation": "English",
-  "status": "ACTIVE" | "COMPLETED" | "FAILED"
-}`.trim()
+User: ${userName}. Goal: ${objective}
+${summary ? `Past Context: ${summary}` : ''}
+Rules: 1. Speak Mandarin. 2. Evaluate if Goal achieved. 3. FAIL if off-track.
+JSON Output: {"content": "Mandarin", "translation": "English", "status": "ACTIVE"|"COMPLETED"|"FAILED"}`.trim()
     };
 
     const messages = [systemMessage, ...history];
-    console.log("--- AI PROMPT DEBUG ---");
-    console.log(JSON.stringify(messages, null, 2));
-    console.log("-----------------------");
-
     const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: messages,
@@ -45,16 +34,37 @@ Return JSON:
         response_format: { type: "json_object" },
     });
 
-    const result = JSON.parse(response.choices[0]?.message?.content || '{}');
-
-    console.log(`[Game Master] Objective: "${objective}"`);
-    console.log(`[Game Master] Verdict: ${result.status}`);
+    const rawContent = response.choices[0]?.message?.content?.trim() || '{}';
+    let result;
+    try {
+        result = JSON.parse(rawContent);
+    } catch (e) {
+        console.error("AI Parse Error:", rawContent);
+        result = { content: "抱歉，请稍后再试。", translation: "Sorry, try again later.", status: "ACTIVE" };
+    }
 
     return {
         content: result.content || "...",
         translation: result.translation || "",
-        status: result.status || 'ACTIVE'
+        status: (result.status as 'ACTIVE' | 'COMPLETED' | 'FAILED') || 'ACTIVE'
     };
+}
+
+export async function summarizeHistory(history: ChatMessage[]): Promise<string> {
+    const response = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+            {
+                role: 'system',
+                content: 'Summarize this Mandarin conversation concisely. Focus on: 1. User progress toward goal. 2. Key vocab used. 3. Current emotional state. Keep it under 100 words in English.'
+            },
+            ...history
+        ],
+        temperature: 0.3,
+        max_tokens: 200,
+    });
+
+    return response.choices[0]?.message?.content?.trim() || "Previous conversation started.";
 }
 
 export async function generateFeedback(
@@ -72,25 +82,12 @@ export async function generateFeedback(
         messages: [
             {
                 role: 'system',
-                content: `You are a Mandarin Coach. Analyze the conversation.
-Scenario: "${scenarioTitle}", Goal: "${objective}"
-Return JSON:
-{
+                content: `Mandarin Coach. Analyze: Scenario: "${scenarioTitle}", Goal: "${objective}"
+JSON Output: {
   "score": (0-100),
-  "feedback": "2-3 sentence summary",
-  "corrections": [
-    {
-      "category": "Grammar" | "Word Choice" | "Spelling" | "Other",
-      "original": "User Hanzi",
-      "correction": "Target Hanzi",
-      "pinyin": "Pinyin",
-      "translation": "English",
-      "explanation": "Briefly why"
-    }
-  ],
-  "suggestedFlashcards": [
-    { "hanzi": "chars", "pinyin": "tones", "meaning": "English", "explanation": "Context" }
-  ]
+  "feedback": "2-3 sentences",
+  "corrections": [{ "category": "Grammar"|"Word Choice"|"Other", "original": "text", "correction": "text", "pinyin": "tones", "translation": "English", "explanation": "why" }],
+  "suggestedFlashcards": [{ "hanzi": "chars", "pinyin": "tones", "meaning": "English", "explanation": "context" }]
 }`.trim()
             },
             ...history
