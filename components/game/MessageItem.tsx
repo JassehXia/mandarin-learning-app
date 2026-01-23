@@ -20,6 +20,7 @@ interface MessageItemProps {
     isTranslationVisible: boolean;
     onToggleTranslation: (id: string) => void;
     difficulty: string;
+    onWordClick?: (word: string) => void;
 }
 
 export function MessageItem({
@@ -28,7 +29,8 @@ export function MessageItem({
     isPlaying,
     isTranslationVisible,
     onToggleTranslation,
-    difficulty
+    difficulty,
+    onWordClick
 }: MessageItemProps) {
     const isAssistant = message.role === "assistant";
 
@@ -41,7 +43,7 @@ export function MessageItem({
                     }`}
             >
                 <div className="relative">
-                    <WordAnalysis content={message.content} />
+                    <WordAnalysis content={message.content} onWordClick={onWordClick} />
                 </div>
                 {isAssistant && (
                     <div className="mt-2 pt-2 border-t border-gray-100/50">

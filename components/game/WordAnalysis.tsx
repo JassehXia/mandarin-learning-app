@@ -6,9 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface WordAnalysisProps {
     content: string;
+    onWordClick?: (word: string) => void;
 }
 
-export function WordAnalysis({ content }: WordAnalysisProps) {
+export function WordAnalysis({ content, onWordClick }: WordAnalysisProps) {
     const [selectedWord, setSelectedWord] = useState<{
         text: string;
         pinyin: string;
@@ -25,6 +26,7 @@ export function WordAnalysis({ content }: WordAnalysisProps) {
         } else {
             const wordPinyin = pinyin(text, { toneType: "symbol" });
             setSelectedWord({ text: text, pinyin: wordPinyin, index });
+            onWordClick?.(text);
         }
     };
 

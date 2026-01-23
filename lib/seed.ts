@@ -73,10 +73,39 @@ async function main() {
                 icon: "Gift",
                 order: 3
             }
+        }),
+        tutorial: await prisma.pathway.create({
+            data: {
+                title: "Tutorial",
+                description: "Learn how to use the app with Teacher Zhang.",
+                icon: "GraduationCap",
+                order: 0
+            }
         })
     };
 
     console.log("Pathways created.");
+
+    // --- PATHWAY 0: TUTORIAL ---
+    const welcome = await prisma.scenario.create({
+        data: {
+            id: "tutorial-welcome",
+            title: "Welcome to Shanghai",
+            description: "A quick guide to start your journey.",
+            objective: "Initiate conversation with Teacher Zhang by saying 'nǐ hǎo' (Hello). Learn how to check objectives, listen to audio, see pinyin, and save flashcards.",
+            difficulty: "Beginner",
+            location: "Shanghai Airport",
+            characterId: c.teacher.id,
+            pathwayId: p.tutorial.id,
+            x: 50, y: 50,
+            keyPhrases: [
+                { phrase: "你好", pinyin: "nǐ hǎo", translation: "hello" },
+                { phrase: "谢谢", pinyin: "xièxiè", translation: "thank you" },
+                { phrase: "再见", pinyin: "zàijiàn", translation: "goodbye" },
+                { phrase: "上海", pinyin: "Shànghǎi", translation: "Shanghai" }
+            ]
+        }
+    });
 
     // --- PATHWAY 1: A DAY IN THE LIFE ---
     const breakfast = await prisma.scenario.create({

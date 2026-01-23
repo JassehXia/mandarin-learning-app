@@ -11,6 +11,7 @@ import { ChatInput } from "./ChatInput";
 import { WarmupGame } from "./WarmupGame";
 import { SelectionToolbar } from "./SelectionToolbar";
 import { AddFlashcardDialog } from "./AddFlashcardDialog";
+import { TutorialOverlay, TutorialStep } from "./TutorialOverlay";
 import { translateSelection } from "@/actions/flashcards";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -69,7 +70,11 @@ export function ChatInterface({
     const [showWarmup, setShowWarmup] = useState(true);
     const [selectionData, setSelectionData] = useState<{ hanzi: string; pinyin: string; meaning: string } | null>(null);
     const [isFlashcardOpen, setIsFlashcardOpen] = useState(false);
+    const [tutorialStep, setTutorialStep] = useState<TutorialStep>("WARMUP");
+    const [isTutorialMinimized, setIsTutorialMinimized] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    const isTutorial = scenario.id === "tutorial-welcome";
 
     const toggleTranslation = (id: string) => {
         setVisibleTranslations((prev) => {
@@ -91,10 +96,20 @@ export function ChatInterface({
         const voices = window.speechSynthesis.getVoices();
         const zhVoice = voices.find(v => v.lang.includes('zh-CN') || v.lang.includes('zh-TW')) || voices.find(v => v.lang.includes('zh'));
         if (zhVoice) utterance.voice = zhVoice;
-        utterance.onend = () => setIsPlaying(null);
+        utterance.onend = () => {
+            setIsPlaying(null);
+            if (isTutorial && tutorialStep === "PLAYBACK") setTutorialStep("PINYIN");
+        };
         utterance.onerror = () => setIsPlaying(null);
         window.speechSynthesis.speak(utterance);
     };
+
+    useEffect(() => {
+        if (!isTutorial) return;
+        if (!showWarmup && tutorialStep === "WARMUP") {
+            setTutorialStep("OBJECTIVE");
+        }
+    }, [showWarmup, isTutorial, tutorialStep]);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -131,6 +146,10 @@ export function ChatInterface({
             if (result.feedback !== null) setFeedback(result.feedback);
             if (result.corrections) setCorrections(result.corrections);
             if (result.suggestedFlashcards) setSuggestedFlashcards(result.suggestedFlashcards);
+
+            if (isTutorial && tutorialStep === "INITIATE") {
+                setTutorialStep("PLAYBACK");
+            }
         } catch (error) {
             console.error("Failed to send message", error);
         } finally {
@@ -149,6 +168,7 @@ export function ChatInterface({
                 meaning: data.meaning
             });
             setIsFlashcardOpen(true);
+            if (isTutorial && tutorialStep === "FLASHCARD") setTutorialStep("COMPLETE");
         } catch (error) {
             console.error("Failed to translate selection:", error);
         }
@@ -165,6 +185,9 @@ export function ChatInterface({
                 isLoading={isLoading}
                 showCheatSheet={showCheatSheet}
                 onToggleCheatSheet={() => setShowCheatSheet(!showCheatSheet)}
+                onObjectiveClick={() => {
+                    if (isTutorial && tutorialStep === "OBJECTIVE") setTutorialStep("INITIATE");
+                }}
             />
 
             <div className="flex-1 relative overflow-hidden flex flex-col">
@@ -215,6 +238,9 @@ export function ChatInterface({
                                             isTranslationVisible={visibleTranslations.has(msg.id)}
                                             onToggleTranslation={toggleTranslation}
                                             difficulty={scenario.difficulty}
+                                            onWordClick={() => {
+                                                if (isTutorial && tutorialStep === "PINYIN") setTutorialStep("FLASHCARD");
+                                            }}
                                         />
                                     ))}
                                     {isLoading && (
@@ -265,6 +291,14 @@ export function ChatInterface({
                 onOpenChange={setIsFlashcardOpen}
                 initialData={selectionData}
             />
+
+            {isTutorial && (
+                <TutorialOverlay
+                    currentStep={tutorialStep}
+                    isMinimized={isTutorialMinimized}
+                    onToggleMinimize={() => setIsTutorialMinimized(!isTutorialMinimized)}
+                />
+            )}
         </div>
     );
 }

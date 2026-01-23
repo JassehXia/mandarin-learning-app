@@ -20,6 +20,7 @@ interface ChatHUDProps {
     isLoading: boolean;
     showCheatSheet: boolean;
     onToggleCheatSheet: () => void;
+    onObjectiveClick?: () => void;
 }
 
 export function ChatHUD({
@@ -30,7 +31,8 @@ export function ChatHUD({
     gameStatus,
     isLoading,
     showCheatSheet,
-    onToggleCheatSheet
+    onToggleCheatSheet,
+    onObjectiveClick
 }: ChatHUDProps) {
     return (
         <header className="flex flex-col sm:flex-row items-center justify-between border-b border-[#E8E1D5] bg-white px-4 md:px-6 py-3 sm:py-4 shadow-sm z-[40]">
@@ -42,7 +44,10 @@ export function ChatHUD({
                 <div className="hidden sm:block h-4 w-px bg-[#E8E1D5]" />
                 <Dialog>
                     <DialogTrigger asChild>
-                        <button className="text-[#5C4B3A] text-[10px] sm:text-sm line-clamp-1 text-center sm:text-left hover:text-[#C41E3A] transition-colors group/obj flex items-center gap-1.5 focus:outline-none">
+                        <button
+                            onClick={onObjectiveClick}
+                            className="text-[#5C4B3A] text-[10px] sm:text-sm line-clamp-1 text-center sm:text-left hover:text-[#C41E3A] transition-colors group/obj flex items-center gap-1.5 focus:outline-none"
+                        >
                             <span className="font-bold text-[#D4AF37] whitespace-nowrap">Objective:</span>
                             <span className="truncate">{objective}</span>
                             <Info className="w-3 h-3 opacity-0 group-hover/obj:opacity-100 transition-opacity shrink-0" />
