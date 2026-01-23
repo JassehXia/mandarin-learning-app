@@ -97,7 +97,7 @@ async function main() {
             location: "Shanghai Airport",
             characterId: c.teacher.id,
             pathwayId: p.tutorial.id,
-            x: 50, y: 50,
+            x: 50, y: 15,
             keyPhrases: [
                 { phrase: "你好", pinyin: "nǐ hǎo", translation: "hello" },
                 { phrase: "谢谢", pinyin: "xièxiè", translation: "thank you" },
