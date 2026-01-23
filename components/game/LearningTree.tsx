@@ -12,10 +12,10 @@ interface LearningTreeProps {
 
 export function LearningTree({ scenarios, completedScenarioIds }: LearningTreeProps) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const [scale, setScale] = useState(1);
+    const [scale, setScale] = useState(0.85); // Default to slightly zoomed out for better mobile overview
 
     // Vertical offset to ensure top nodes/popups aren't covered
-    const BASE_Y_OFFSET = 120;
+    const BASE_Y_OFFSET = 100;
 
     // Determine status and coordinates for each scenario
     const scenariosWithStatus = useMemo(() => {
@@ -71,7 +71,7 @@ export function LearningTree({ scenarios, completedScenarioIds }: LearningTreePr
     const contentHeight = useMemo(() => {
         if (scenarios.length === 0) return 1000;
         const maxY = Math.max(...scenarios.map(s => s.y));
-        return (maxY * 10) + BASE_Y_OFFSET + 400; // Large bottom buffer
+        return (maxY * 10) + BASE_Y_OFFSET + 300;
     }, [scenarios]);
 
     const handleZoom = (delta: number) => {
@@ -79,54 +79,59 @@ export function LearningTree({ scenarios, completedScenarioIds }: LearningTreePr
     };
 
     const resetView = () => {
-        setScale(1);
+        setScale(window?.innerWidth < 768 ? 0.7 : 1);
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
-    // Center content horizontally on mount
+    // Center content horizontally and vertically scroll to top on mount
     useEffect(() => {
         if (scrollContainerRef.current) {
             const container = scrollContainerRef.current;
             container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+
+            // On mobile, start slightly more zoomed out
+            if (window.innerWidth < 768) {
+                setScale(0.7);
+            }
         }
     }, [scenarios]);
 
     return (
-        <div className="relative w-full h-full overflow-hidden rounded-[3rem] border border-[#E8E1D5]/50 shadow-inner bg-[#FDFBF7]">
-            {/* Viewport controls */}
-            <div className="absolute top-6 right-6 z-50 flex flex-col gap-2">
+        <div className="relative w-full h-full overflow-hidden rounded-2xl sm:rounded-[3rem] border border-[#E8E1D5]/50 shadow-inner bg-[#FDFBF7]">
+            {/* Viewport controls - More compact on mobile */}
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[40] flex flex-col gap-2">
                 <Button
                     variant="secondary"
                     size="icon"
                     onClick={() => handleZoom(0.1)}
-                    className="bg-white/80 backdrop-blur-sm border-[#E8E1D5] hover:bg-white text-[#C41E3A] shadow-lg rounded-xl"
+                    className="h-9 w-9 sm:h-10 sm:w-10 bg-white/90 backdrop-blur-sm border-[#E8E1D5] hover:bg-white text-[#C41E3A] shadow-lg rounded-xl"
                 >
-                    <ZoomIn className="w-5 h-5" />
+                    <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
                 <Button
                     variant="secondary"
                     size="icon"
                     onClick={() => handleZoom(-0.1)}
-                    className="bg-white/80 backdrop-blur-sm border-[#E8E1D5] hover:bg-white text-[#C41E3A] shadow-lg rounded-xl"
+                    className="h-9 w-9 sm:h-10 sm:w-10 bg-white/90 backdrop-blur-sm border-[#E8E1D5] hover:bg-white text-[#C41E3A] shadow-lg rounded-xl"
                 >
-                    <ZoomOut className="w-5 h-5" />
+                    <ZoomOut className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
                 <Button
                     variant="secondary"
                     size="icon"
                     onClick={resetView}
-                    className="bg-white/80 backdrop-blur-sm border-[#E8E1D5] hover:bg-white text-[#C41E3A] shadow-lg rounded-xl"
+                    className="h-9 w-9 sm:h-10 sm:w-10 bg-white/90 backdrop-blur-sm border-[#E8E1D5] hover:bg-white text-[#C41E3A] shadow-lg rounded-xl"
                 >
-                    <RefreshCw className="w-5 h-5" />
+                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
             </div>
 
             {/* Scrollable Container */}
             <div
                 ref={scrollContainerRef}
-                className="w-full h-full overflow-auto scrollbar-hide"
+                className="w-full h-full overflow-auto scrollbar-hide active:cursor-grabbing touch-pan-x touch-pan-y"
                 style={{ scrollBehavior: 'smooth' }}
             >
                 <div
@@ -134,7 +139,7 @@ export function LearningTree({ scenarios, completedScenarioIds }: LearningTreePr
                     style={{
                         height: `${contentHeight}px`,
                         width: '100%',
-                        minWidth: '800px', // Robust base width for horizontal spread
+                        minWidth: '600px', // Reduced from 800px for better fit
                         transform: `scale(${scale})`
                     }}
                 >
@@ -187,8 +192,8 @@ export function LearningTree({ scenarios, completedScenarioIds }: LearningTreePr
             </div>
 
             {/* Subtle Gradient Shadows */}
-            <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-[#FDFBF7] to-transparent pointer-events-none z-10 opacity-50" />
-            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#FDFBF7] to-transparent pointer-events-none z-10 opacity-50" />
+            <div className="absolute top-0 left-0 right-0 h-8 sm:h-12 bg-gradient-to-b from-[#FDFBF7] to-transparent pointer-events-none z-10 opacity-50" />
+            <div className="absolute bottom-0 left-0 right-0 h-8 sm:h-12 bg-gradient-to-t from-[#FDFBF7] to-transparent pointer-events-none z-10 opacity-50" />
         </div>
     );
 }

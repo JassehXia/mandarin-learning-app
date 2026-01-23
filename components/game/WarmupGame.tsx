@@ -24,6 +24,7 @@ export function WarmupGame({ keyPhrases, onComplete }: WarmupGameProps) {
     const [selectedPhrase, setSelectedPhrase] = useState<string | null>(null);
     const [wrongMatch, setWrongMatch] = useState<string | null>(null);
     const [revealedPinyin, setRevealedPinyin] = useState<Set<string>>(new Set());
+    const [lastClick, setLastClick] = useState<{ phrase: string; time: number } | null>(null);
 
     useEffect(() => {
         const phrases = keyPhrases.map(kp => kp.phrase);
@@ -35,18 +36,22 @@ export function WarmupGame({ keyPhrases, onComplete }: WarmupGameProps) {
 
     const handlePhraseClick = (phrase: string) => {
         if (Object.values(matches).includes(phrase)) return;
-        setSelectedPhrase(selectedPhrase === phrase ? null : phrase);
-        setWrongMatch(null);
-    };
 
-    const togglePinyin = (e: React.MouseEvent, phrase: string) => {
-        e.stopPropagation();
-        setRevealedPinyin(prev => {
-            const next = new Set(prev);
-            if (next.has(phrase)) next.delete(phrase);
-            else next.add(phrase);
-            return next;
-        });
+        const now = Date.now();
+        if (lastClick?.phrase === phrase && now - lastClick.time < 300) {
+            // Double tap detected
+            setRevealedPinyin(prev => {
+                const next = new Set(prev);
+                if (next.has(phrase)) next.delete(phrase);
+                else next.add(phrase);
+                return next;
+            });
+            setLastClick(null);
+        } else {
+            setSelectedPhrase(selectedPhrase === phrase ? null : phrase);
+            setWrongMatch(null);
+            setLastClick({ phrase, time: now });
+        }
     };
 
     const handleTranslationClick = (translation: string) => {
@@ -87,7 +92,7 @@ export function WarmupGame({ keyPhrases, onComplete }: WarmupGameProps) {
                     <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF37]" />
                     Vocab Warm-up
                 </h2>
-                <p className="text-[#8A7E72] mt-1 text-xs font-medium">Click a character, then its meaning to match</p>
+                <p className="text-[#8A7E72] mt-1 text-xs font-medium">Match character to meaning • Double-tap to see Pinyin</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 sm:gap-8 w-full max-w-2xl relative">
@@ -130,15 +135,6 @@ export function WarmupGame({ keyPhrases, onComplete }: WarmupGameProps) {
                                         >
                                             {phraseData?.pinyin}
                                         </motion.span>
-                                    )}
-                                    {!isMatched && (
-                                        <div
-                                            onClick={(e) => togglePinyin(e, phrase)}
-                                            className={`absolute bottom-1 right-1 p-1 rounded-full hover:bg-black/5 transition-opacity opacity-0 group-hover:opacity-100
-                                                ${isSelected ? "text-white/40 hover:text-white/80" : "text-[#8A7E72] hover:text-[#C41E3A]"}`}
-                                        >
-                                            {isPinyinVisible ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                                        </div>
                                     )}
                                 </motion.button>
                             );

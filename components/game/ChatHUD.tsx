@@ -26,15 +26,15 @@ export function ChatHUD({
     onToggleCheatSheet
 }: ChatHUDProps) {
     return (
-        <header className="flex items-center justify-between border-b border-[#E8E1D5] bg-white px-4 md:px-6 py-4 shadow-sm z-10">
-            <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-[#C41E3A] font-serif font-bold">
-                    <MapPin className="h-5 w-5" />
+        <header className="flex flex-col sm:flex-row items-center justify-between border-b border-[#E8E1D5] bg-white px-4 md:px-6 py-3 sm:py-4 shadow-sm z-[40]">
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-4 mb-2 sm:mb-0 w-full sm:w-auto">
+                <div className="flex items-center gap-2 text-[#C41E3A] font-serif font-bold text-sm sm:text-base">
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span>{location}</span>
                 </div>
-                <div className="hidden md:block h-4 w-px bg-[#E8E1D5]" />
-                <div className="hidden md:block text-[#5C4B3A] text-sm">
-                    <span className="font-bold mr-2 text-[#D4AF37]">Objective:</span>
+                <div className="hidden sm:block h-4 w-px bg-[#E8E1D5]" />
+                <div className="text-[#5C4B3A] text-[10px] sm:text-sm line-clamp-1 text-center sm:text-left">
+                    <span className="font-bold mr-1 sm:mr-2 text-[#D4AF37]">Objective:</span>
                     {objective}
                 </div>
             </div>
