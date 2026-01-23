@@ -62,6 +62,7 @@ export default async function PlayPage({ params }: { params: { scenarioId: strin
                 id: fullConversation.scenario.id,
                 title: fullConversation.scenario.title,
                 objective: fullConversation.scenario.objective,
+                difficulty: fullConversation.scenario.difficulty,
                 location: fullConversation.scenario.location,
                 keyPhrases: fullConversation.scenario.keyPhrases,
                 character: {

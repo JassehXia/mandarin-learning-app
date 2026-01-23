@@ -21,7 +21,7 @@ export function ChatInput({
     setInput,
     onSubmit,
     disabled,
-    isLoading
+    isLoading,
 }: ChatInputProps) {
     const [isToneMode, setIsToneMode] = useState(true);
 

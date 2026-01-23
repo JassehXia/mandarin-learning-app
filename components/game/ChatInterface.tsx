@@ -29,6 +29,7 @@ interface ChatInterfaceProps {
         id: string;
         title: string;
         objective: string;
+        difficulty: string;
         location: string;
         keyPhrases?: any;
         character: {
@@ -148,6 +149,7 @@ export function ChatInterface({
                         keyPhrases={scenario.keyPhrases}
                         onPlayAudio={playText}
                         isPlaying={isPlaying}
+                        difficulty={scenario.difficulty}
                     />
                 )}
 
@@ -165,6 +167,7 @@ export function ChatInterface({
                                 isPlaying={isPlaying}
                                 isTranslationVisible={visibleTranslations.has(msg.id)}
                                 onToggleTranslation={toggleTranslation}
+                                difficulty={scenario.difficulty}
                             />
                         ))}
                         {isLoading && (

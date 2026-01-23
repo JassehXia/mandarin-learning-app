@@ -7,12 +7,14 @@ interface CheatSheetPanelProps {
     keyPhrases: any[];
     onPlayAudio: (text: string, id: string) => void;
     isPlaying: string | null;
+    difficulty: string;
 }
 
 export function CheatSheetPanel({
     keyPhrases,
     onPlayAudio,
-    isPlaying
+    isPlaying,
+    difficulty
 }: CheatSheetPanelProps) {
     if (!keyPhrases || keyPhrases.length === 0) return null;
 
@@ -37,8 +39,12 @@ export function CheatSheetPanel({
                             <div className="flex-1">
                                 <div className="flex flex-col">
                                     <span className="text-sm font-bold text-[#2C2C2C]">{kp.phrase}</span>
-                                    <span className="text-[10px] text-[#C41E3A] font-medium">{kp.pinyin}</span>
-                                    <span className="text-xs text-gray-500 mt-0.5">{kp.translation}</span>
+                                    {difficulty !== "Advanced" && (
+                                        <span className="text-[10px] text-[#C41E3A] font-medium">{kp.pinyin}</span>
+                                    )}
+                                    {difficulty === "Beginner" && (
+                                        <span className="text-xs text-gray-500 mt-0.5">{kp.translation}</span>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Languages, Volume2 } from "lucide-react";
 
+import { WordAnalysis } from "./WordAnalysis";
+
 interface Message {
     id: string;
     role: "user" | "assistant";
@@ -17,6 +19,7 @@ interface MessageItemProps {
     isPlaying: string | null;
     isTranslationVisible: boolean;
     onToggleTranslation: (id: string) => void;
+    difficulty: string;
 }
 
 export function MessageItem({
@@ -24,7 +27,8 @@ export function MessageItem({
     onPlayAudio,
     isPlaying,
     isTranslationVisible,
-    onToggleTranslation
+    onToggleTranslation,
+    difficulty
 }: MessageItemProps) {
     const isAssistant = message.role === "assistant";
 
@@ -36,37 +40,43 @@ export function MessageItem({
                     : "bg-white border border-[#E8E1D5] text-[#2C2C2C] rounded-tl-none"
                     }`}
             >
-                <div>{message.content}</div>
+                <div className="relative">
+                    <WordAnalysis content={message.content} />
+                </div>
                 {isAssistant && (
                     <div className="mt-2 pt-2 border-t border-gray-100/50">
-                        {message.pinyin && (
+                        {message.pinyin && difficulty !== "Advanced" && (
                             <div className="text-sm text-gray-500 font-medium mb-1">{message.pinyin}</div>
                         )}
-                        {message.translation && (
-                            <div className="mt-1 flex items-center gap-2">
-                                {isTranslationVisible ? (
-                                    <div className="text-sm text-gray-400 italic bg-gray-50/50 p-2 rounded-lg border border-gray-100 relative group/trans flex-1">
-                                        {message.translation}
-                                        <button
-                                            type="button"
+                        <div className="mt-1 flex items-center gap-2">
+                            {message.translation && difficulty === "Beginner" && (
+                                <>
+                                    {isTranslationVisible ? (
+                                        <div className="text-sm text-gray-400 italic bg-gray-50/50 p-2 rounded-lg border border-gray-100 relative group/trans flex-1">
+                                            {message.translation}
+                                            <button
+                                                type="button"
+                                                onClick={() => onToggleTranslation(message.id)}
+                                                className="absolute top-1 right-1 opacity-0 group-hover/trans:opacity-100 transition-opacity text-[10px] text-gray-300 hover:text-[#C41E3A]"
+                                                title="Hide Translation"
+                                            >
+                                                Hide
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
                                             onClick={() => onToggleTranslation(message.id)}
-                                            className="absolute top-1 right-1 opacity-0 group-hover/trans:opacity-100 transition-opacity text-[10px] text-gray-300 hover:text-[#C41E3A]"
-                                            title="Hide Translation"
+                                            className="h-7 text-[10px] text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 gap-1.5 px-2 mt-1"
                                         >
-                                            Hide
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => onToggleTranslation(message.id)}
-                                        className="h-7 text-[10px] text-[#8A7E72] hover:text-[#C41E3A] hover:bg-[#C41E3A]/5 gap-1.5 px-2 mt-1"
-                                    >
-                                        <Languages className="w-3 h-3" />
-                                        Show Translation
-                                    </Button>
-                                )}
+                                            <Languages className="w-3 h-3" />
+                                            Show Translation
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+                            <div className={difficulty === "Beginner" ? "" : "flex-1 flex justify-end"}>
                                 <Button
                                     variant="outline"
                                     size="icon"
@@ -77,7 +87,7 @@ export function MessageItem({
                                     <Volume2 className={`w-3.5 h-3.5 ${isPlaying === message.id ? "animate-pulse" : ""}`} />
                                 </Button>
                             </div>
-                        )}
+                        </div>
                     </div>
                 )}
             </div>
