@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Keyboard, Info } from "lucide-react";
+import { Send, Keyboard, Info, Mic, MicOff, Loader2 } from "lucide-react";
 import { convertToToneMarks } from "@/lib/pinyin-input-util";
 import { cn } from "@/lib/utils";
 import { AudioButton } from "@/components/ui/AudioButton";
@@ -24,6 +24,55 @@ export function ChatInput({
     isLoading,
 }: ChatInputProps) {
     const [isToneMode, setIsToneMode] = useState(true);
+    const [isRecording, setIsRecording] = useState(false);
+    const recognitionRef = useRef<any>(null);
+
+    useEffect(() => {
+        // Initialize Speech Recognition
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            recognitionRef.current = new SpeechRecognition();
+            recognitionRef.current.continuous = true;
+            recognitionRef.current.interimResults = true;
+            recognitionRef.current.lang = 'zh-CN';
+
+            recognitionRef.current.onresult = (event: any) => {
+                const transcript = Array.from(event.results)
+                    .map((result: any) => result[0])
+                    .map((result: any) => result.transcript)
+                    .join('');
+                setInput(transcript);
+            };
+
+            recognitionRef.current.onerror = (event: any) => {
+                console.error("Speech Recognition Error:", event.error);
+                setIsRecording(false);
+            };
+
+            recognitionRef.current.onend = () => {
+                setIsRecording(false);
+            };
+        }
+
+        return () => {
+            if (recognitionRef.current) recognitionRef.current.stop();
+        };
+    }, [setInput]);
+
+    const toggleRecording = () => {
+        if (!recognitionRef.current) {
+            alert("Speech recognition is not supported in this browser.");
+            return;
+        }
+
+        if (isRecording) {
+            recognitionRef.current.stop();
+        } else {
+            setInput("");
+            recognitionRef.current.start();
+            setIsRecording(true);
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value;
@@ -41,8 +90,11 @@ export function ChatInput({
                         <Input
                             value={input}
                             onChange={handleInputChange}
-                            placeholder="Type your response..."
-                            className="w-full border-[#E8E1D5] bg-[#FDFBF7] text-base sm:text-lg h-14 pr-24 sm:pr-28 focus-visible:ring-[#C41E3A] rounded-2xl shadow-sm transition-all"
+                            placeholder={isRecording ? "Listening..." : "Type or speak your response..."}
+                            className={cn(
+                                "w-full border-[#E8E1D5] bg-[#FDFBF7] text-base sm:text-lg h-14 pr-32 sm:pr-36 focus-visible:ring-[#C41E3A] rounded-2xl shadow-sm transition-all",
+                                isRecording && "ring-2 ring-[#C41E3A] animate-pulse"
+                            )}
                             autoFocus
                             disabled={disabled}
                         />
@@ -53,8 +105,21 @@ export function ChatInput({
                                 size="sm"
                                 variant="ghost"
                                 disabled={!input.trim() || disabled}
-                                label=""
                             />
+                            <button
+                                type="button"
+                                onClick={toggleRecording}
+                                disabled={disabled}
+                                className={cn(
+                                    "p-2 rounded-lg transition-all",
+                                    isRecording
+                                        ? "bg-[#C41E3A] text-white animate-pulse"
+                                        : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                                )}
+                                title={isRecording ? "Stop Recording" : "Start Voice Input"}
+                            >
+                                {isRecording ? <MicOff className="w-5 h-5 sm:w-4 sm:h-4" /> : <Mic className="w-5 h-5 sm:w-4 sm:h-4" />}
+                            </button>
                             <button
                                 type="button"
                                 onClick={() => setIsToneMode(!isToneMode)}

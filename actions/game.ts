@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma as db } from "@/lib/prisma"; // Use the singleton
-import { chatWithCharacter, generateFeedback, getHanziFromPinyin, summarizeHistory } from "@/lib/ai";
+import { chatWithCharacter, generateFeedback, getHanziFromPinyin, summarizeHistory, generateHints } from "@/lib/ai";
 import { revalidatePath } from "next/cache";
 import { getOrCreateUser } from "@/lib/auth-util";
 import { pinyin } from "pinyin-pro";
@@ -218,5 +218,24 @@ export async function deleteConversation(conversationId: string) {
 
 export async function convertPinyinToHanzi(pinyin: string): Promise<string> {
     return await getHanziFromPinyin(pinyin);
+}
+
+export async function getAIHints(conversationId: string) {
+    const conversation = await db.conversation.findUnique({
+        where: { id: conversationId },
+        include: {
+            scenario: true,
+            messages: { orderBy: { createdAt: 'asc' } }
+        }
+    });
+
+    if (!conversation) throw new Error("Conversation not found");
+
+    const history = conversation.messages.map(m => ({
+        role: m.role as 'user' | 'assistant',
+        content: m.content
+    }));
+
+    return await generateHints(history, conversation.scenario.title, conversation.scenario.objective);
 }
 

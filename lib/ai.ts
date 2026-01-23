@@ -166,3 +166,41 @@ export async function translateSelection(text: string): Promise<{ pinyin: string
         return { pinyin: "", meaning: "" };
     }
 }
+
+export async function generateHints(
+    history: { role: 'user' | 'assistant', content: string }[],
+    scenarioTitle: string,
+    scenarioObjective: string
+) {
+    const prompt = `You are a helpful Mandarin tutor. The user is in a language learning scenario: "${scenarioTitle}". 
+    The objective is: "${scenarioObjective}".
+    
+    Current Conversation History:
+    ${history.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n')}
+    
+    Based on the current state of the conversation, suggest 3 natural and helpful ways the user can respond to achieve their objective.
+    For each suggestion, provide:
+    1. hanzi (Chinese characters)
+    2. pinyin (with tone marks)
+    3. meaning (English translation)
+    
+    Return ONLY a JSON object in this format:
+    {
+        "hints": [
+            { "hanzi": "...", "pinyin": "...", "meaning": "..." },
+            { "hanzi": "...", "pinyin": "...", "meaning": "..." },
+            { "hanzi": "...", "pinyin": "...", "meaning": "..." }
+        ]
+    }`;
+
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "system", content: prompt }],
+        response_format: { type: "json_object" }
+    });
+
+    const content = response.choices[0]?.message?.content || '{"hints": []}';
+    return JSON.parse(content) as {
+        hints: { hanzi: string; pinyin: string; meaning: string }[]
+    };
+}

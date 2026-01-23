@@ -216,10 +216,11 @@ export function ChatInterface({
                         >
                             {showCheatSheet && (
                                 <CheatSheetPanel
-                                    keyPhrases={scenario.keyPhrases}
+                                    keyPhrases={scenario.keyPhrases || []}
                                     onPlayAudio={playText}
                                     isPlaying={isPlaying}
                                     difficulty={scenario.difficulty}
+                                    conversationId={conversationId}
                                 />
                             )}
 
