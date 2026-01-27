@@ -26,6 +26,8 @@ interface AddFlashcardDialogProps {
         pinyin: string;
         meaning: string;
     } | null;
+    folders?: { id: string; name: string }[];
+    defaultFolderId?: string;
     trigger?: React.ReactNode;
 }
 
@@ -33,6 +35,8 @@ export function AddFlashcardDialog({
     open: controlledOpen,
     onOpenChange: setControlledOpen,
     initialData,
+    folders,
+    defaultFolderId,
     trigger
 }: AddFlashcardDialogProps) {
     const [internalOpen, setInternalOpen] = useState(false);
@@ -47,18 +51,20 @@ export function AddFlashcardDialog({
         pinyin: "",
         meaning: "",
         explanation: "",
+        folderId: ""
     });
 
     useEffect(() => {
-        if (initialData && open) {
+        if (open) {
             setFormData({
-                hanzi: initialData.hanzi || "",
-                pinyin: initialData.pinyin || "",
-                meaning: initialData.meaning || "",
+                hanzi: initialData?.hanzi || "",
+                pinyin: initialData?.pinyin || "",
+                meaning: initialData?.meaning || "",
                 explanation: "",
+                folderId: defaultFolderId || ""
             });
         }
-    }, [initialData, open]);
+    }, [initialData, open, defaultFolderId]);
 
     const handlePinyinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -72,9 +78,12 @@ export function AddFlashcardDialog({
         e.preventDefault();
         setLoading(true);
         try {
-            await saveFlashcard(formData);
+            await saveFlashcard({
+                ...formData,
+                folderId: formData.folderId || undefined
+            });
             setOpen(false);
-            setFormData({ hanzi: "", pinyin: "", meaning: "", explanation: "" });
+            setFormData({ hanzi: "", pinyin: "", meaning: "", explanation: "", folderId: "" });
             router.refresh();
         } catch (error) {
             console.error("Failed to save flashcard:", error);
@@ -136,6 +145,24 @@ export function AddFlashcardDialog({
                             className="bg-white/50 border-[#EAD0A8] focus:border-[#C41E3A] focus:ring-[#C41E3A] rounded-xl h-12"
                         />
                     </div>
+
+                    {folders && folders.length > 0 && (
+                        <div className="space-y-2">
+                            <Label htmlFor="folder" className="text-[#5C4B3A] font-bold">Folder (Optional)</Label>
+                            <select
+                                id="folder"
+                                value={formData.folderId}
+                                onChange={(e) => setFormData({ ...formData, folderId: e.target.value })}
+                                className="w-full bg-white/50 border-[#EAD0A8] border-2 focus:border-[#C41E3A] focus:ring-[#C41E3A] rounded-xl h-12 px-3 outline-none transition-colors"
+                            >
+                                <option value="">No Folder</option>
+                                {folders.map(f => (
+                                    <option key={f.id} value={f.id}>{f.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
                     <div className="space-y-2">
                         <Label htmlFor="explanation" className="text-[#5C4B3A] font-bold">Explanation (Optional)</Label>
                         <Textarea
@@ -160,3 +187,4 @@ export function AddFlashcardDialog({
         </Dialog>
     );
 }
+

@@ -1,4 +1,4 @@
-import { getUserFlashcards } from "@/actions/flashcards";
+import { getUserFlashcards, getFolders } from "@/actions/flashcards";
 import { FlashcardManager } from "@/components/game/FlashcardManager";
 import { getOrCreateUser } from "@/lib/auth-util";
 import { redirect } from "next/navigation";
@@ -16,6 +16,7 @@ export default async function FlashcardsPage() {
     }
 
     const flashcards = await getUserFlashcards();
+    const folders = await getFolders();
 
     return (
         <main className="min-h-screen bg-[#FDFBF7] py-12 md:py-20">
@@ -42,9 +43,10 @@ export default async function FlashcardsPage() {
                         </div>
                     </div>
 
-                    <FlashcardManager flashcards={flashcards} />
+                    <FlashcardManager flashcards={flashcards} folders={folders} />
                 </div>
             </div>
         </main>
     );
 }
+

@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id                   String         @id @default(cuid())
-  clerkId              String?        @unique // Link to Clerk User
-  email                String?        @unique
+  id                   String            @id @default(cuid())
+  clerkId              String?           @unique // Link to Clerk User
+  email                String?           @unique
   conversations        Conversation[]
   flashcards           Flashcard[]
-  completedScenarioIds String[]       @default([])
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
+  flashcardFolders     FlashcardFolder[]
+  completedScenarioIds String[]          @default([])
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
 }
 
 model Pathway {
@@ -96,6 +97,18 @@ model Message {
   createdAt DateTime @default(now())
 }
 
+model FlashcardFolder {
+  id         String      @id @default(cuid())
+  name       String
+  user       User        @relation(fields: [userId], references: [id])
+  userId     String
+  flashcards Flashcard[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([userId])
+}
+
 model Flashcard {
   id          String  @id @default(cuid())
   hanzi       String
@@ -106,8 +119,12 @@ model Flashcard {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
+  folder   FlashcardFolder? @relation(fields: [folderId], references: [id])
+  folderId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([folderId])
 }

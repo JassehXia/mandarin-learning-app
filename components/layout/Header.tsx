@@ -29,8 +29,8 @@ export function Header() {
     const navLinks = [
         { href: "/", label: "Home", icon: Home, public: true },
         { href: "/stages", label: "Your Journey", icon: Compass, public: true },
-        { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, public: false },
-        { href: "/flashcards", label: "Flashcards", icon: Languages, public: false },
+        { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, public: true },
+        { href: "/flashcards", label: "Flashcards", icon: Languages, public: true },
     ];
 
     return (
@@ -142,8 +142,8 @@ export function Header() {
                                             key={link.href}
                                             href={link.href}
                                             className={`flex items-center gap-4 p-4 rounded-xl transition-all ${pathname === link.href
-                                                    ? "bg-[#C41E3A] text-white shadow-lg"
-                                                    : "text-[#5C4B3A] hover:bg-[#E8E1D5]/20"
+                                                ? "bg-[#C41E3A] text-white shadow-lg"
+                                                : "text-[#5C4B3A] hover:bg-[#E8E1D5]/20"
                                                 }`}
                                         >
                                             <Icon className={`w-5 h-5 ${pathname === link.href ? "text-white" : "text-[#D4AF37]"}`} />

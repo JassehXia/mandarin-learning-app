@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function ReviewPage({
     searchParams,
 }: {
-    searchParams: { mode?: string };
+    searchParams: Promise<{ mode?: string; folderId?: string }>;
 }) {
     const user = await getOrCreateUser();
 
@@ -20,9 +20,10 @@ export default async function ReviewPage({
         redirect("/");
     }
 
-    const flashcards = await getUserFlashcards();
-    const params = await searchParams;
-    const mode = params.mode || "quiz";
+    const { mode: modeParam, folderId } = await searchParams;
+    const flashcards = await getUserFlashcards(folderId);
+    const mode = modeParam || "quiz";
+
 
     return (
         <main className="min-h-screen bg-[#FDFBF7] py-12 md:py-20">
