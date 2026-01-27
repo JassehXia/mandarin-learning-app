@@ -21,7 +21,8 @@ export async function chatWithCharacter(
         content: `Roleplay: ${characterPrompt}
 User: ${userName}. Goal: ${objective}
 ${summary ? `Past Context: ${summary}` : ''}
-Rules: 1. Speak Mandarin. 2. Evaluate if Goal achieved. 3. FAIL if off-track.
+Rules: 1. Speak Mandarin. 2. Be concise (2-3 sentences max). 3. Stay in character. 4. Evaluate Goal: set 'COMPLETED' ONLY if ALL sub-tasks mentioned in the Goal are fully achieved. 5. FAIL if off-track.
+Avoid generic responses like "...". If you're stuck, ask a relevant follow-up in character.
 JSON Output: {"content": "Mandarin", "translation": "English", "status": "ACTIVE"|"COMPLETED"|"FAILED"}`.trim()
     };
 
@@ -48,6 +49,38 @@ JSON Output: {"content": "Mandarin", "translation": "English", "status": "ACTIVE
         translation: result.translation || "",
         status: (result.status as 'ACTIVE' | 'COMPLETED' | 'FAILED') || 'ACTIVE'
     };
+}
+
+export async function* chatWithCharacterStream(
+    history: ChatMessage[],
+    characterPrompt: string,
+    objective: string,
+    summary?: string,
+    userName: string = "Traveler"
+) {
+    const systemMessage: ChatMessage = {
+        role: 'system',
+        content: `Roleplay: ${characterPrompt}
+User: ${userName}. Goal: ${objective}
+${summary ? `Past Context: ${summary}` : ''}
+Rules: 1. Speak Mandarin. 2. Be concise (2-3 sentences max). 3. Stay in character. 4. Evaluate Goal: set 'COMPLETED' ONLY if ALL sub-tasks or requirements in the Goal are fully addressed. 5. FAIL if off-track.
+Avoid generic responses like "...". If you're stuck, ask a relevant follow-up in character.
+Return a Mandarin response first, then after a delimiter "---METADATA---", return a JSON object with: 
+{"translation": "English translation of YOUR Mandarin response above", "status": "ACTIVE"|"COMPLETED"|"FAILED"}`.trim()
+    };
+
+    const stream = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [systemMessage, ...history],
+        temperature: 0.8,
+        max_tokens: 400,
+        stream: true,
+    });
+
+    for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content || "";
+        if (content) yield content;
+    }
 }
 
 export async function summarizeHistory(history: ChatMessage[]): Promise<string> {

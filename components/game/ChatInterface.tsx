@@ -14,6 +14,7 @@ import { AddFlashcardDialog } from "./AddFlashcardDialog";
 import { TutorialOverlay, TutorialStep } from "./TutorialOverlay";
 import { translateSelection } from "@/actions/flashcards";
 import { AnimatePresence, motion } from "framer-motion";
+import { pinyin } from "pinyin-pro";
 
 interface Message {
     id: string;
@@ -124,34 +125,126 @@ export function ChatInterface({
         e.preventDefault();
         if (!input.trim() || isLoading || gameStatus !== "ACTIVE") return;
 
-        const tempId = Date.now().toString();
-        const userMsg: Message = { id: tempId, role: "user", content: input };
+        const userMsg: Message = { id: Date.now().toString(), role: "user", content: input };
         setMessages((prev) => [...prev, userMsg]);
         setInput("");
         setIsLoading(true);
 
+        // Create placeholder for AI message
+        const aiMsgId = (Date.now() + 1).toString();
+        const placeholderAiMsg: Message = { id: aiMsgId, role: "assistant", content: "" };
+        setMessages((prev) => [...prev, placeholderAiMsg]);
+
         try {
-            const result = await submitMessage(conversationId, userMsg.content);
-            const aiMsg: Message = {
-                id: result.message.id,
-                role: "assistant",
-                content: result.message.content,
-                pinyin: result.message.pinyin || undefined,
-                translation: result.message.translation || undefined
-            };
-            setMessages((prev) => [...prev, aiMsg]);
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ conversationId, content: userMsg.content }),
+            });
 
-            if (result.status !== gameStatus) setGameStatus(result.status);
-            if (result.score !== null) setScore(result.score);
-            if (result.feedback !== null) setFeedback(result.feedback);
-            if (result.corrections) setCorrections(result.corrections);
-            if (result.suggestedFlashcards) setSuggestedFlashcards(result.suggestedFlashcards);
+            if (!response.ok) throw new Error("Failed to send message");
 
-            if (isTutorial && tutorialStep === "INITIATE") {
-                setTutorialStep("PLAYBACK");
+            const reader = response.body?.getReader();
+            if (!reader) throw new Error("Failed to get stream reader");
+
+            let fullText = "";
+            const decoder = new TextDecoder();
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                fullText += chunk;
+
+                // Strip metadata for UI display
+                const displayText = fullText.split("---METADATA---")[0].trim();
+
+                setMessages((prev) =>
+                    prev.map((msg) =>
+                        msg.id === aiMsgId ? { ...msg, content: displayText } : msg
+                    )
+                );
             }
+
+            // End of stream handling
+            const finalContent = fullText.split("---METADATA---")[0].trim();
+            const metadataParts = fullText.split("---METADATA---");
+            const reportParts = fullText.split("---REPORT---");
+
+            let metadata: any = {};
+            if (metadataParts[1]) {
+                try {
+                    const potentialJson = metadataParts[1].split("---REPORT---")[0].trim();
+                    metadata = JSON.parse(potentialJson);
+                } catch (e) {
+                    console.error("Failed to parse basic metadata", e);
+                }
+            }
+
+            let reportData: any = null;
+            if (reportParts[1]) {
+                try {
+                    reportData = JSON.parse(reportParts[1].trim());
+                } catch (e) {
+                    console.error("Failed to parse report data", e);
+                }
+            }
+
+            // Error Handling for "..." or empty
+            if (finalContent === "..." || !finalContent) {
+                setMessages((prev) =>
+                    prev.map((msg) =>
+                        msg.id === aiMsgId
+                            ? { ...msg, content: "抱歉，我刚才走神了。请再说一遍？", translation: "Sorry, I spaced out for a moment. Could you say that again?" }
+                            : msg
+                    )
+                );
+            } else {
+                setMessages((prev) =>
+                    prev.map((msg) =>
+                        msg.id === aiMsgId
+                            ? {
+                                ...msg,
+                                content: finalContent,
+                                pinyin: finalContent ? (
+                                    (() => {
+                                        try { return pinyin(finalContent); }
+                                        catch (e) { console.error("Pinyin error:", e); return ""; }
+                                    })()
+                                ) : "",
+                                translation: metadata.translation || reportData?.translation,
+                            }
+                            : msg
+                    )
+                );
+
+                const finalStatus = reportData?.status || metadata.status;
+                if (finalStatus && finalStatus !== gameStatus) {
+                    setGameStatus(finalStatus);
+                }
+
+                if (reportData) {
+                    if (reportData.score !== undefined) setScore(reportData.score);
+                    if (reportData.feedback) setFeedback(reportData.feedback);
+                    if (reportData.corrections) setCorrections(reportData.corrections);
+                    if (reportData.suggestedFlashcards) setSuggestedFlashcards(reportData.suggestedFlashcards);
+                }
+
+                if (isTutorial && tutorialStep === "INITIATE") {
+                    setTutorialStep("PLAYBACK");
+                }
+            }
+
         } catch (error) {
             console.error("Failed to send message", error);
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg.id === aiMsgId
+                        ? { ...msg, content: "发生内部错误。请再试一次或重新组织您的语言。", translation: "An internal error occurred. Please try again or rephrase your message." }
+                        : msg
+                )
+            );
         } finally {
             setIsLoading(false);
         }

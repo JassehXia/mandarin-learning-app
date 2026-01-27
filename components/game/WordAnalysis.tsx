@@ -16,8 +16,14 @@ export function WordAnalysis({ content, onWordClick }: WordAnalysisProps) {
         index: number;
     } | null>(null);
 
-    // Segment the content into words
-    const segments = segment(content);
+    // Segment the content into words - skip if empty and wrap in try/catch to avoid pinyin-pro internal errors
+    let segments: any[] = [];
+    try {
+        segments = content ? segment(content) : [];
+    } catch (e) {
+        console.error("pinyin-pro segment error:", e);
+        segments = content ? [content] : [];
+    }
 
     const handleWordClick = (word: any, index: number) => {
         const text = typeof word === "string" ? word : word.origin;

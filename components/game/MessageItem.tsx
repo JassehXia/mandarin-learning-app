@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Languages, Volume2 } from "lucide-react";
+import { useState } from "react";
 
 import { WordAnalysis } from "./WordAnalysis";
 
@@ -33,6 +34,7 @@ export function MessageItem({
     onWordClick
 }: MessageItemProps) {
     const isAssistant = message.role === "assistant";
+    const [localShowPinyin, setLocalShowPinyin] = useState(difficulty !== "Advanced");
 
     return (
         <div className={`flex w-full ${!isAssistant ? "justify-end" : "justify-start"}`}>
@@ -47,7 +49,7 @@ export function MessageItem({
                 </div>
                 {isAssistant && (
                     <div className="mt-2 pt-2 border-t border-gray-100/50">
-                        {message.pinyin && difficulty !== "Advanced" && (
+                        {message.pinyin && localShowPinyin && (
                             <div className="text-sm text-gray-500 font-medium mb-1">{message.pinyin}</div>
                         )}
                         <div className="mt-1 flex items-center gap-2">
@@ -78,7 +80,18 @@ export function MessageItem({
                                     )}
                                 </>
                             )}
-                            <div className={difficulty === "Beginner" ? "" : "flex-1 flex justify-end"}>
+                            <div className={difficulty === "Beginner" ? "" : "flex-1 flex justify-end items-center gap-2"}>
+                                {message.pinyin && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setLocalShowPinyin(!localShowPinyin)}
+                                        className={`h-7 w-7 rounded-sm text-[10px] font-bold border transition-colors ${localShowPinyin ? "text-[#C41E3A] border-[#C41E3A] bg-[#C41E3A]/5" : "text-gray-400 border-gray-200 hover:border-[#C41E3A]/30 hover:text-[#C41E3A]"}`}
+                                        title={localShowPinyin ? "Hide Pinyin" : "Show Pinyin"}
+                                    >
+                                        拼
+                                    </Button>
+                                )}
                                 <Button
                                     variant="outline"
                                     size="icon"

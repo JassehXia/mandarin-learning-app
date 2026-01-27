@@ -95,8 +95,8 @@ export async function submitMessage(conversationId: string, content: string) {
     const aiResponse = await chatWithCharacter(finalHistory as any, character.personalityPrompt, scenario.objective, summary);
 
     // 5. Generate Pinyin Server-Side
-    const cleanedContent = aiResponse.content.replace(/\s+/g, '');
-    const responsePinyin = pinyin(cleanedContent);
+    const cleanedContent = aiResponse.content.trim();
+    const responsePinyin = cleanedContent ? pinyin(cleanedContent) : "";
 
     // 6. Save AI Response
     const newMessage = await db.message.create({

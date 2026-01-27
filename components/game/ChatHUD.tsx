@@ -46,9 +46,9 @@ export function ChatHUD({
                     <DialogTrigger asChild>
                         <button
                             onClick={onObjectiveClick}
-                            className="text-[#5C4B3A] text-[10px] sm:text-sm line-clamp-1 text-center sm:text-left hover:text-[#C41E3A] transition-colors group/obj flex items-center gap-1.5 focus:outline-none"
+                            className="text-[#5C4B3A] text-[10px] sm:text-sm line-clamp-1 max-w-[120px] sm:max-w-[250px] md:max-w-[400px] text-center sm:text-left hover:text-[#C41E3A] transition-colors group/obj flex items-center gap-1.5 focus:outline-none"
                         >
-                            <span className="font-bold text-[#D4AF37] whitespace-nowrap">Objective:</span>
+                            <span className="font-bold text-[#D4AF37] whitespace-nowrap">Goal:</span>
                             <span className="truncate">{objective}</span>
                             <Info className="w-3 h-3 opacity-0 group-hover/obj:opacity-100 transition-opacity shrink-0" />
                         </button>
@@ -66,7 +66,20 @@ export function ChatHUD({
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+                {/* Status Indicator inside the button group area for better alignment */}
+                <div className="hidden xs:flex items-center mr-1">
+                    {gameStatus === "COMPLETED" && (
+                        <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-[9px] font-bold uppercase tracking-wider border border-green-200">Success</span>
+                    )}
+                    {gameStatus === "ACTIVE" && (
+                        <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-[9px] font-bold uppercase tracking-wider border border-yellow-200">Active</span>
+                    )}
+                    {gameStatus === "FAILED" && (
+                        <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded-full text-[9px] font-bold uppercase tracking-wider border border-red-200">Failed</span>
+                    )}
+                </div>
+
                 <Button
                     variant="ghost"
                     size="sm"
@@ -92,17 +105,6 @@ export function ChatHUD({
                     <RotateCcw className="h-4 w-4" />
                     <span className="hidden sm:inline">Start Over</span>
                 </Button>
-
-                {/* Status Indicator */}
-                {gameStatus === "COMPLETED" && (
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold uppercase tracking-wider">Success</span>
-                )}
-                {gameStatus === "ACTIVE" && (
-                    <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold uppercase tracking-wider">Active</span>
-                )}
-                {gameStatus === "FAILED" && (
-                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-bold uppercase tracking-wider">Failed</span>
-                )}
             </div>
         </header>
     );
