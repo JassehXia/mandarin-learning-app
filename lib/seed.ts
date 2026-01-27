@@ -92,7 +92,7 @@ async function main() {
             id: "tutorial-welcome",
             title: "Welcome to Shanghai",
             description: "A quick guide to start your journey.",
-            objective: "Initiate conversation with Teacher Zhang by saying 'nǐ hǎo' (Hello). Learn how to check objectives, listen to audio, see pinyin, and save flashcards.",
+            objective: "Initiate conversation with Teacher Zhang by saying 'nǐ hǎo' (Hello) to start your journey!",
             difficulty: "Beginner",
             location: "Shanghai Airport",
             characterId: c.teacher.id,

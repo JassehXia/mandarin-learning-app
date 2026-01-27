@@ -92,7 +92,14 @@ export async function submitMessage(conversationId: string, content: string) {
     }
 
     // 5. Run AI
-    const aiResponse = await chatWithCharacter(finalHistory as any, character.personalityPrompt, scenario.objective, summary);
+    const aiResponse = await chatWithCharacter(
+        finalHistory as any,
+        character.personalityPrompt,
+        scenario.objective,
+        summary,
+        "Traveler",
+        scenario.id === "tutorial-welcome"
+    );
 
     // 5. Generate Pinyin Server-Side
     const cleanedContent = aiResponse.content.trim();

@@ -59,7 +59,9 @@ export async function POST(req: NextRequest) {
                         finalHistory as any,
                         character.personalityPrompt,
                         scenario.objective,
-                        summary
+                        summary,
+                        "Traveler",
+                        scenario.id === "tutorial-welcome"
                     );
 
                     for await (const chunk of aiStream) {

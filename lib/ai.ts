@@ -14,14 +14,17 @@ export async function chatWithCharacter(
     characterPrompt: string,
     objective: string,
     summary?: string,
-    userName: string = "Traveler"
+    userName: string = "Traveler",
+    isTutorial: boolean = false
 ): Promise<{ content: string; translation: string; status: 'ACTIVE' | 'COMPLETED' | 'FAILED' }> {
     const systemMessage: ChatMessage = {
         role: 'system',
         content: `Roleplay: ${characterPrompt}
 User: ${userName}. Goal: ${objective}
 ${summary ? `Past Context: ${summary}` : ''}
-Rules: 1. Speak Mandarin. 2. Be concise (2-3 sentences max). 3. Stay in character. 4. Evaluate Goal: set 'COMPLETED' ONLY if ALL sub-tasks mentioned in the Goal are fully achieved. 5. FAIL if off-track.
+${isTutorial
+                ? `Tutorial Mode: Be extremely encouraging. Always set status to 'COMPLETED' if the user greets you or says anything helpful like 'hi', 'hello', or 'ni hao'. Make it impossible to fail.`
+                : `Rules: 1. Speak Mandarin. 2. Be concise (2-3 sentences max). 3. Stay in character. 4. Evaluate Goal: set 'COMPLETED' ONLY if ALL sub-tasks mentioned in the Goal are fully achieved. 5. FAIL if off-track.`}
 Avoid generic responses like "...". If you're stuck, ask a relevant follow-up in character.
 JSON Output: {"content": "Mandarin", "translation": "English", "status": "ACTIVE"|"COMPLETED"|"FAILED"}`.trim()
     };
@@ -56,14 +59,17 @@ export async function* chatWithCharacterStream(
     characterPrompt: string,
     objective: string,
     summary?: string,
-    userName: string = "Traveler"
+    userName: string = "Traveler",
+    isTutorial: boolean = false
 ) {
     const systemMessage: ChatMessage = {
         role: 'system',
         content: `Roleplay: ${characterPrompt}
 User: ${userName}. Goal: ${objective}
 ${summary ? `Past Context: ${summary}` : ''}
-Rules: 1. Speak Mandarin. 2. Be concise (2-3 sentences max). 3. Stay in character. 4. Evaluate Goal: set 'COMPLETED' ONLY if ALL sub-tasks or requirements in the Goal are fully addressed. 5. FAIL if off-track.
+${isTutorial
+                ? `Tutorial Mode: Be extremely encouraging. Always set status to 'COMPLETED' if the user greets you or says anything helpful like 'hi', 'hello', or 'ni hao'. Make it impossible to fail.`
+                : `Rules: 1. Speak Mandarin. 2. Be concise (2-3 sentences max). 3. Stay in character. 4. Evaluate Goal: set 'COMPLETED' ONLY if ALL sub-tasks or requirements in the Goal are fully addressed. 5. FAIL if off-track.`}
 Avoid generic responses like "...". If you're stuck, ask a relevant follow-up in character.
 Return a Mandarin response first, then after a delimiter "---METADATA---", return a JSON object with: 
 {"translation": "English translation of YOUR Mandarin response above", "status": "ACTIVE"|"COMPLETED"|"FAILED"}`.trim()
