@@ -35,7 +35,7 @@ export default async function DashboardPage() {
                             Your Progress
                         </div>
                         <h1 className="text-4xl md:text-6xl font-serif font-black text-[#2D241E] tracking-tight">
-                            Personal <span className="italic">Stats</span>
+                            Personal <span className="">Stats</span>
                         </h1>
                     </div>
                     <div className="flex gap-3">
